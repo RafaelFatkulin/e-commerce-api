@@ -7,10 +7,18 @@
   },
   "dependencies": {
     "@elysiajs/swagger": "^1.1.6",
-    "elysia": "latest"
+    "@paralleldrive/cuid2": "^2.2.2",
+    "dotenv": "^16.4.5",
+    "drizzle-orm": "^0.36.4",
+    "elysia": "latest",
+    "pg": "^8.13.1"
   },
   "devDependencies": {
-    "bun-types": "latest"
+    "@types/pg": "^8.11.10",
+    "bun-types": "latest",
+    "drizzle-kit": "^0.28.1",
+    "drizzle-typebox": "^0.1.1",
+    "tsx": "^4.19.2"
   },
   "module": "src/index.js"
 }
