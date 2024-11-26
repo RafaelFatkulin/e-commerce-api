@@ -1,11 +1,15 @@
-import { Elysia } from "elysia";
-import swagger from "@elysiajs/swagger";
+import { Hono } from 'hono'
+import { serveStatic } from "hono/bun";
 
-const app = new Elysia()
-    .use(swagger())
-    .get("/", () => 'hello')
-    .listen(3000);
+const app = new Hono()
 
-console.log(
-  `🦊 Elysia is running at ${app.server?.hostname}:${app.server?.port}`
-);
+app.get('/', (c) => {
+  return c.text('Hello Hono!')
+})
+
+app.use('/static/*', serveStatic({root: './'}))
+
+export default {
+  port: 8000,
+  fetch: app.fetch
+}
