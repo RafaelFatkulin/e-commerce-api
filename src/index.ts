@@ -1,7 +1,7 @@
 import { Hono } from 'hono'
 import { serveStatic } from "hono/bun";
 import {showRoutes} from 'hono/dev'
-import {users} from "./modules";
+import {users} from "@modules/users";
 
 const app = new Hono()
 
