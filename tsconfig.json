@@ -6,7 +6,8 @@
     "paths": {
       "@/*": ["./src/*"],
       "@db/*": ["./src/db/*"],
-      "@modules/*": ["./src/modules/*"]
+      "@modules/*": ["./src/modules/*"],
+      "@utils/*": ["./src/utils/*"]
     }
   }
 }

@@ -1,46 +1,85 @@
-import {db} from "@/db";
-import {table} from "@db/schema";
-import {InsertUser, UpdateUser} from "@modules/users/users.type";
-import {eq} from "drizzle-orm";
+import { db } from "@/db";
+import { takeUniqueOrThrow } from "@/utils/drizzle";
+import { table } from "@db/schema";
+import { InsertUser, ReturnUser, SelectUser, UpdateUser } from "@modules/users/users.type";
+import { eq } from "drizzle-orm";
 
-export const getUsers = async () => {
-    return db
-        .select()
-        .from(table.user);
-}
+// Object with user selection fields, excluding sensitive data
+const userSelect = {
+  id: table.user.id,
+  email: table.user.email,
+  name: table.user.name,
+  surname: table.user.surname,
+  patronymic: table.user.patronymic,
+} as const;
 
-export const getUserById = async (id: number) => {
-    return db
-        .select()
-        .from(table.user)
-        .where(eq(table.user.id, id));
-}
+/**
+ * Get list of all users
+ */
+export const getUsers = async (): Promise<ReturnUser[]> => {
+  return db.select(userSelect).from(table.user);
+};
 
-export const getUserByEmail = async (email: string) => {
-    return db
-        .select()
-        .from(table.user)
-        .where(eq(table.user.email, email));
-}
+/**
+ * Get user by ID
+ * @throws {Error} If user is not found
+ */
+export const getUserById = async (id: number): Promise<ReturnUser> => {
+  return db
+    .select(userSelect)
+    .from(table.user)
+    .where(eq(table.user.id, id))
+    .then(takeUniqueOrThrow);
+};
 
-export const createUser = (data: InsertUser) => {
-    return db
-        .insert(table.user)
-        .values(data)
-        .returning()
-}
+/**
+ * Get user by email
+ * @throws {Error} If user is not found
+ */
+export const getUserByEmail = async (email: string): Promise<SelectUser> => {
+  return db
+    .select()
+    .from(table.user)
+    .where(eq(table.user.email, email))
+    .then(takeUniqueOrThrow);
+};
 
-export const updateUser = (id: number, data: UpdateUser) => {
-    return db
-        .update(table.user)
-        .set(data)
-        .where(eq(table.user.id, id))
-        .returning()
-}
+/**
+ * Create new user
+ * @throws {Error} If user creation fails
+ */
+export const createUser = async (data: InsertUser): Promise<ReturnUser> => {
+  return db
+    .insert(table.user)
+    .values(data)
+    .returning(userSelect)
+    .then(takeUniqueOrThrow);
+};
 
-export const deleteUser = async (id: number) => {
-    return db
-        .delete(table.user)
-        .where(eq(table.user.id, id))
-        .returning();
-}
+/**
+ * Update user data
+ * @throws {Error} If user is not found or update fails
+ */
+export const updateUser = async (
+  id: number,
+  data: UpdateUser
+): Promise<ReturnUser> => {
+  return db
+    .update(table.user)
+    .set({ ...data, updated_at: new Date() })
+    .where(eq(table.user.id, id))
+    .returning(userSelect)
+    .then(takeUniqueOrThrow);
+};
+
+/**
+ * Delete user
+ * @throws {Error} If user is not found
+ */
+export const deleteUser = async (id: number): Promise<ReturnUser> => {
+  return db
+    .delete(table.user)
+    .where(eq(table.user.id, id))
+    .returning(userSelect)
+    .then(takeUniqueOrThrow);
+};
