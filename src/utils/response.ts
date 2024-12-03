@@ -1,10 +1,10 @@
-interface SuccessResponse<T> {
+export interface SuccessResponse<T> {
   success: boolean;
   data: T;
   message?: string;
 }
 
-interface ErrorResponse {
+export interface ErrorResponse {
   success: boolean;
   message: string;
 }

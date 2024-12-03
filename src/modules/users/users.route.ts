@@ -66,7 +66,7 @@ users.patch("/:id", zValidator("json", updateUserSchema), async (c) => {
     const userData = c.req.valid("json");
 
     const existingUser = await getUserById(id).catch(() => null);
-    
+
     if (!existingUser) {
       return c.json(sendError("Такой пользователь не найден"), 404);
     }
@@ -94,7 +94,10 @@ users.delete("/:id", async (c) => {
     }
 
     return c.json(
-      sendSuccess(deletedUser, `Пользователь ${deletedUser.email} успешно удален`)
+      sendSuccess(
+        deletedUser,
+        `Пользователь ${deletedUser.email} успешно удален`
+      )
     );
   } catch (error) {
     return c.json(sendError("Не удалось удалить пользователя"), 500);

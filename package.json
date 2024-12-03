@@ -1,11 +1,13 @@
 {
   "name": "e-commerce-api",
   "scripts": {
-    "dev": "bun run --hot src/index.ts"
+    "dev": "bun run --hot src/index.ts",
+    "test": "vitest"
   },
   "dependencies": {
+    "@hono/zod-openapi": "^0.18.3",
     "@hono/zod-validator": "^0.4.1",
-    "dotenv": "^16.4.5",
+    "@scalar/hono-api-reference": "^0.5.162",
     "drizzle-orm": "^0.36.4",
     "drizzle-zod": "^0.5.1",
     "hono": "^4.6.12",
@@ -16,6 +18,7 @@
     "@types/bun": "latest",
     "@types/pg": "^8.11.10",
     "drizzle-kit": "^0.28.1",
-    "tsx": "^4.19.2"
+    "tsx": "^4.19.2",
+    "vitest": "^2.1.8"
   }
 }
