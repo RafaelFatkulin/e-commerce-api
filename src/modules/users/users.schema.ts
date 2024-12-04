@@ -8,6 +8,7 @@ export const insertUserSchema = createInsertSchema(table.user, {
   name: z.string().min(2, "Минимальная длина имени - 2 символа"),
   surname: z.string().min(2, "Минимальная длина фамилии - 2 символа"),
   patronymic: z.string().optional(),
+  role: z.enum(["admin", "user"]).default("user"),
 });
 
 export const selectUserSchema = createSelectSchema(table.user);
@@ -24,5 +25,6 @@ export const updateUserSchema = insertUserSchema
     surname: true,
     patronymic: true,
     email: true,
+    role: true,
   })
   .partial();

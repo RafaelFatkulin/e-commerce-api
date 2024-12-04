@@ -1,7 +1,12 @@
 import { db } from "@/db";
 import { takeUniqueOrThrow } from "@/utils/drizzle";
 import { table } from "@db/schema";
-import { InsertUser, ReturnUser, SelectUser, UpdateUser } from "@modules/users/users.type";
+import {
+  InsertUser,
+  ReturnUser,
+  SelectUser,
+  UpdateUser,
+} from "@modules/users/users.type";
 import { eq } from "drizzle-orm";
 
 // Object with user selection fields, excluding sensitive data
@@ -11,6 +16,7 @@ const userSelect = {
   name: table.user.name,
   surname: table.user.surname,
   patronymic: table.user.patronymic,
+  role: table.user.role,
 } as const;
 
 /**

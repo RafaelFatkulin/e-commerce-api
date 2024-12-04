@@ -114,7 +114,7 @@ auth.post("/logout", async (c) => {
   return c.json(sendSuccess(null, "Успешный выход"));
 });
 
-auth.get("/me", authMiddleware, async (c) => {
+auth.get("/profile", authMiddleware(["user", "admin"]), async (c) => {
   try {
     const user = c.get("user");
     const currentUser = await getCurrentUser(user.id);
