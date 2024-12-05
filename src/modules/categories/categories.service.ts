@@ -1,13 +1,19 @@
 import { db } from "@/db";
 import { takeUniqueOrThrow } from "@/utils/drizzle";
-import { InsertCategory, ReturnCategory } from "./categories.type";
+import {
+  InsertCategory,
+  ReturnCategory,
+  UpdateCategory,
+} from "./categories.type";
 import { table } from "@/db/schema";
 import { eq } from "drizzle-orm";
+import { trans } from "@/utils/transliterate";
 
 // Object with category selection fields, excluding sensitive data
 const categorySelect = {
   id: table.category.id,
   title: table.category.title,
+  slug: table.category.slug,
 } as const;
 
 /**
@@ -52,7 +58,7 @@ export const createCategory = async (
 ): Promise<ReturnCategory> => {
   return db
     .insert(table.category)
-    .values(data)
+    .values({ ...data, slug: trans(data.title) })
     .returning(categorySelect)
     .then(takeUniqueOrThrow);
 };
@@ -63,11 +69,11 @@ export const createCategory = async (
  */
 export const updateCategory = async (
   id: number,
-  data: InsertCategory
+  data: UpdateCategory
 ): Promise<ReturnCategory> => {
   return db
     .update(table.category)
-    .set({ ...data, updated_at: new Date() })
+    .set({ ...data, slug: trans(data.title ?? ""), updated_at: new Date() })
     .where(eq(table.category.id, id))
     .returning(categorySelect)
     .then(takeUniqueOrThrow);
@@ -84,5 +90,3 @@ export const deleteCategory = async (id: number): Promise<ReturnCategory> => {
     .returning(categorySelect)
     .then(takeUniqueOrThrow);
 };
-
-

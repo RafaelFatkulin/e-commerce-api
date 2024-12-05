@@ -27,6 +27,7 @@ export const user = pgTable("users", {
 export const category = pgTable("categories", {
   id: integer().primaryKey().generatedAlwaysAsIdentity(),
   title: varchar({ length: 255 }).notNull().unique(),
+  slug: varchar({ length: 255 }).notNull().unique(),
   created_at: timestamp().defaultNow(),
   updated_at: timestamp().defaultNow(),
 });
@@ -35,6 +36,7 @@ export const category = pgTable("categories", {
 export const product = pgTable("products", {
   id: integer().primaryKey().generatedAlwaysAsIdentity(),
   title: varchar({ length: 255 }).notNull(),
+  slug: varchar({ length: 255 }).notNull().unique(),
   created_at: timestamp().defaultNow(),
   updated_at: timestamp().defaultNow(),
 });
