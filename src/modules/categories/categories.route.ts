@@ -31,9 +31,14 @@ categories.get("/:id", async (c) => {
   try {
     const id = parseInt(c.req.param("id"));
     const category = await getCategoryById(id);
+
+    if (!category) {
+      return c.json(sendError("Такая категория не найдена"), 404);
+    }
+
     return c.json(sendSuccess(category));
   } catch (error) {
-    return c.json(sendError("Такая категория не найдена"), 500);
+    return c.json(sendError("Такая категория не найдена"), 404);
   }
 });
 

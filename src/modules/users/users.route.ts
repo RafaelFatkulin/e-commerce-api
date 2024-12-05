@@ -30,6 +30,9 @@ users.get("/:id", async (c) => {
   try {
     const id = parseInt(c.req.param("id"));
     const user = await getUserById(id);
+    if (!user) {
+      return c.json(sendError("Такой пользователь не найден"), 404);
+    }
     return c.json(sendSuccess(user, "Пользователь успешно найден"));
   } catch (error) {
     return c.json(sendError("Такой пользователь не найден"), 404);

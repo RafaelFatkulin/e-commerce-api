@@ -1,6 +1,8 @@
 import { relations } from "drizzle-orm";
 import {
   integer,
+  jsonb,
+  numeric,
   pgEnum,
   pgTable,
   timestamp,
@@ -32,23 +34,74 @@ export const category = pgTable("categories", {
   updated_at: timestamp().defaultNow(),
 });
 
+export const categoriesRelations = relations(category, ({ many }) => ({
+  categoriesToProducts: many(categoriesToProducts),
+}));
+
+// COLOR
+export const color = pgTable("colors", {
+  id: integer().primaryKey().generatedAlwaysAsIdentity(),
+  title: varchar({ length: 50 }).notNull().unique(),
+  value: varchar({ length: 50 }).notNull(),
+});
+
+export const colorRelations = relations(color, ({ many }) => ({
+  products: many(product),
+}));
+
+// SIZE
+export const size = pgTable("sizes", {
+  id: integer().primaryKey().generatedAlwaysAsIdentity(),
+  title: varchar({ length: 12 }).notNull().unique(),
+  details: jsonb().$type<{
+    ru?: string;
+    us?: string;
+    uk?: string;
+    jp?: string;
+    gr?: string;
+    fr?: string;
+    it?: string;
+  }>(),
+});
+
+export const sizeRelations = relations(size, ({ many }) => ({
+  products: many(product),
+}));
+
+// MANUFACTURER
+export const manufacturer = pgTable("manufacturers", {
+  id: integer().primaryKey().generatedAlwaysAsIdentity(),
+  title: varchar({ length: 50 }).notNull().unique(),
+});
+
+export const manufacturerRelations = relations(manufacturer, ({ many }) => ({
+  productsInfo: many(productInfo),
+}));
+
 //  PRODUCT
-export const product = pgTable("products", {
+export const productInfo = pgTable("products_info", {
   id: integer().primaryKey().generatedAlwaysAsIdentity(),
   title: varchar({ length: 255 }).notNull(),
   slug: varchar({ length: 255 }).notNull().unique(),
+  manufacturerId: integer("manufacturer_id"),
+
   created_at: timestamp().defaultNow(),
   updated_at: timestamp().defaultNow(),
 });
 
 // RELATIONS
-export const categoriesRelations = relations(category, ({ many }) => ({
-  categoriesToProducts: many(categoriesToProducts),
-}));
 
-export const productsRelations = relations(product, ({ many }) => ({
-  categoriesToProducts: many(categoriesToProducts),
-}));
+export const productsInfoRelations = relations(
+  productInfo,
+  ({ one, many }) => ({
+    categoriesToProducts: many(categoriesToProducts),
+    manufacturer: one(manufacturer, {
+      fields: [productInfo.manufacturerId],
+      references: [manufacturer.id],
+    }),
+    products: many(product),
+  })
+);
 
 export const categoriesToProducts = pgTable("categories_to_products", {
   categoryId: integer("category_id")
@@ -59,10 +112,38 @@ export const categoriesToProducts = pgTable("categories_to_products", {
     .references(() => product.id),
 });
 
+export const product = pgTable("product", {
+  id: integer().primaryKey().generatedAlwaysAsIdentity(),
+  productInfoId: integer("products_info_id").notNull(),
+  colorId: integer("color_id").notNull(),
+  sizeId: integer("size_id").notNull(),
+  count: integer().notNull(),
+  price: numeric({ precision: 2 }).notNull(),
+});
+
+export const productRelations = relations(product, ({ one }) => ({
+  productInfo: one(productInfo, {
+    fields: [product.productInfoId],
+    references: [productInfo.id],
+  }),
+  color: one(color, {
+    fields: [product.colorId],
+    references: [color.id],
+  }),
+  size: one(size, {
+    fields: [product.sizeId],
+    references: [size.id],
+  }),
+}));
+
 // Экспорт таблиц для использования в приложении
 export const table = {
   user,
   category,
+  color,
+  size,
+  manufacturer,
+  productInfo,
   product,
 } as const;
 
