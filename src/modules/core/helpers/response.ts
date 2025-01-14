@@ -22,12 +22,15 @@ export const createSuccessResponse = <T>({
 
 export const createErrorResponse = ({
   message,
+  errors,
 }: {
   message?: string | Record<string, string>;
+  errors?: string | Record<string, any>;
 }) => {
   return {
     success: false,
     message,
+    errors,
     data: null,
   };
 };
