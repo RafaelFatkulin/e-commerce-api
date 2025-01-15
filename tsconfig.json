@@ -1,17 +1,25 @@
 {
   "compilerOptions": {
     "target": "ES2021",
-    "strict": true,
     "jsx": "react-jsx",
     "jsxImportSource": "hono/jsx",
     "baseUrl": "./src",
+    "module": "ES2022",
+    "moduleResolution": "node",
     "paths": {
       "@database": ["database"],
       "@database/*": ["database/*"],
-      "@modules/*": ["modules/*"]
+      "@modules": ["modules"],
+      "@modules/*": ["modules/*"],
+      "@lib": ["lib"],
+      "@lib/*": ["lib/*"],
+      "@helpers": ["helpers"],
+      "@helpers/*": ["helpers/*"],
+      "@utils": ["utils"],
+      "@utils/*": ["utils/*"]
     },
-    "module": "ES2022",
-    "moduleResolution": "node",
-    "types": ["bun-types"]
+    "types": ["bun-types"],
+    "strict": true,
+    "allowSyntheticDefaultImports": true
   }
 }

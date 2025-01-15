@@ -1,47 +1,47 @@
-import { db } from "@database";
-import { table } from "@database/schemas";
-import { asc, desc, eq, ilike, or } from "drizzle-orm";
-import { CreateUser, UpdateUser, UsersFilter } from "./user.type";
+import type { CreateUser, UpdateUser, UsersFilter } from './user.type'
+import { db } from '@database'
+import { table } from '@database/schemas'
+import { asc, desc, eq, ilike, or } from 'drizzle-orm'
 
-export const getUsers = async (filter: UsersFilter) => {
-  const query = db.select().from(table.user);
-  let { q, page, per_page = "10", sort_by, sort_order, role } = filter;
-  let totalUsers = 0;
-  let totalPages = 0;
+export async function getUsers(filter: UsersFilter) {
+  const query = db.select().from(table.user)
+  let { q, page, per_page = '10', sort_by, sort_order, role } = filter
+  let totalUsers = 0
+  let totalPages = 0
 
   if (q) {
-    const searchQuery = `%${q.toLowerCase()}%`;
+    const searchQuery = `%${q.toLowerCase()}%`
     query.where(
       or(
         ilike(table.user.email, searchQuery),
-        ilike(table.user.fullName, searchQuery)
-      )
-    );
+        ilike(table.user.fullName, searchQuery),
+      ),
+    )
   }
 
   if (role) {
-    query.where(eq(table.user.role, role));
+    query.where(eq(table.user.role, role))
   }
 
   if (page && per_page) {
-    totalUsers = await db.$count(table.user);
-    totalPages = Math.ceil(totalUsers / parseInt(per_page));
+    totalUsers = await db.$count(table.user)
+    totalPages = Math.ceil(totalUsers / Number.parseInt(per_page))
 
-    if (parseInt(page) > totalPages) {
-      page = totalPages.toString();
+    if (Number.parseInt(page) > totalPages) {
+      page = totalPages.toString()
     }
 
     query
-      .limit(parseInt(per_page))
-      .offset((parseInt(page) - 1) * parseInt(per_page));
+      .limit(Number.parseInt(per_page))
+      .offset((Number.parseInt(page) - 1) * Number.parseInt(per_page))
   }
 
   if (sort_by && sort_order) {
     query.orderBy(
-      sort_order === "asc"
+      sort_order === 'asc'
         ? asc(table.user[sort_by])
-        : desc(table.user[sort_by])
-    );
+        : desc(table.user[sort_by]),
+    )
   }
 
   return {
@@ -50,38 +50,38 @@ export const getUsers = async (filter: UsersFilter) => {
       ? {
           total: totalUsers,
           totalPages,
-          limit: parseInt(per_page),
-          page: parseInt(page),
+          limit: Number.parseInt(per_page),
+          page: Number.parseInt(page),
         }
       : undefined,
-  };
-};
+  }
+}
 
-export const getUser = async (id: number) => {
-  return (await db.select().from(table.user).where(eq(table.user.id, id)))[0];
-};
+export async function getUser(id: number) {
+  return (await db.select().from(table.user).where(eq(table.user.id, id)))[0]
+}
 
-export const getUserByEmail = async (email: string) => {
+export async function getUserByEmail(email: string) {
   return (
     await db.select().from(table.user).where(eq(table.user.email, email))
-  )[0];
-};
+  )[0]
+}
 
-export const createUser = async (userData: CreateUser) => {
+export async function createUser(userData: CreateUser) {
   return db
     .insert(table.user)
-    .values({ ...userData, role: userData.role as "admin" | "user" })
-    .returning();
-};
+    .values({ ...userData, role: userData.role as 'admin' | 'user' })
+    .returning()
+}
 
-export const updateUser = async (userId: number, userData: UpdateUser) => {
+export async function updateUser(userId: number, userData: UpdateUser) {
   return db
     .update(table.user)
     .set(userData)
     .where(eq(table.user.id, userId))
-    .returning();
-};
+    .returning()
+}
 
-export const deleteUser = async (userId: number) => {
-  return db.delete(table.user).where(eq(table.user.id, userId)).returning();
-};
+export async function deleteUser(userId: number) {
+  return db.delete(table.user).where(eq(table.user.id, userId)).returning()
+}

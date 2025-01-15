@@ -1,7 +1,7 @@
-import { user } from "./user";
+import { user } from './user'
 
 export const table = {
   user,
-} as const;
+} as const
 
-export type Table = typeof table;
+export type Table = typeof table
