@@ -17,7 +17,7 @@ export const userSelectSchema = createSelectSchema(table.user).omit({
 export const userCreateSchema = createInsertSchema(table.user, {
   fullName: stringField(4, 128).openapi({ example: 'Иванов Иван Иванович' }),
   email: emailField().openapi({ example: 'ivanov_i@vk.com' }),
-  password: stringField(8, 64).openapi({ example: 'password' }),
+  password: stringField(8, 64).optional().openapi({ example: 'password' }),
   phone: phoneField().optional().openapi({ example: '88005553535' }),
   role: enumField(userRole.enumValues).openapi({ examples: userRole.enumValues }),
 }).omit({
@@ -30,7 +30,7 @@ export const userUpdateSchema = createUpdateSchema(table.user, {
   email: emailField().optional().openapi({ example: 'ivanov_i@vk.com' }),
   password: stringField(8, 64).optional().openapi({ example: 'password' }),
   phone: phoneField().optional().openapi({ example: '88005553535' }),
-  role: enumField(userRole.enumValues).optional().openapi({ examples: userRole.enumValues }),
+  role: enumField(userRole.enumValues).optional(),
 }).omit({
   createdAt: true,
   updatedAt: true,

@@ -42,7 +42,7 @@ export function enumField(values: [string, ...string[]], requiredMessage: string
       }
       return { message: '' }
     },
-  })
+  }).openapi({ examples: values })
 }
 
 export const IdParamsSchema = z.object({
