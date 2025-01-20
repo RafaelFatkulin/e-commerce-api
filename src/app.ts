@@ -17,3 +17,8 @@ configureOpenAPI(app)
 routes.forEach((route) => {
   app.route('/', route)
 })
+
+app.openAPIRegistry.registerComponent('securitySchemes', 'Bearer', {
+  type: 'http',
+  scheme: 'bearer',
+})

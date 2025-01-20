@@ -12,7 +12,11 @@ export const successResponseSchema = z.object({
   data: z.any(),
 })
 
-export function getSuccessResponseSchema(schema: ZodSchema, meta: boolean = false) {
+export function getSuccessResponseSchema(schema?: ZodSchema, meta: boolean = false) {
+  if (!schema) {
+    return successResponseSchema.omit({ meta: true })
+  }
+
   const result = successResponseSchema.extend({
     data: schema,
   })

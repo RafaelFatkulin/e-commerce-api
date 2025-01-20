@@ -3,11 +3,13 @@ import type { Context, Next } from 'hono'
 import { getUser } from '@modules/user/user.service'
 import { createErrorResponse } from '@utils/response'
 import { HttpStatusCodes } from '@utils/status-codes'
-import { password } from 'bun'
 import { verify } from 'hono/jwt'
 
 export async function authMiddleware(c: Context, next: Next, requiredRoles?: User['role'][]) {
-  const token = c.req.header('Authorization')?.split(' ')[1]
+  if (!c) {
+    throw new Error('Context is undefined')
+  }
+  const token = c.req?.header('Authorization')?.split(' ')[1]
 
   if (!token) {
     return c.json(
@@ -44,7 +46,7 @@ export async function authMiddleware(c: Context, next: Next, requiredRoles?: Use
     )
   }
 
-  c.set('user', user)
+  c.set('user', { ...user, password: undefined, createdAt: undefined, updatedAt: undefined })
 
   return next()
 }

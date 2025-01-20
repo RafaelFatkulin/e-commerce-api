@@ -30,6 +30,9 @@ export async function getUsers(filter: UsersFilter) {
   const totalPages = Math.ceil(totalUsers / Number(per_page))
 
   const users = await db.query.user.findMany({
+    columns: {
+      password: false,
+    },
     where(fields, { or, ilike, eq }) {
       const conditions = []
       if (q) {
@@ -90,9 +93,15 @@ export async function createUser(userData: CreateUser) {
     .values({
       ...userData,
       role: userData.role as User['role'],
-      password: await Bun.password.hash(password'password', 'bcrypt'),
+      password: await Bun.password.hash(userData.password ? userData.password : 'password', 'bcrypt'),
     })
-    .returning()
+    .returning({
+      id: table.user.id,
+      fullName: table.user.fullName,
+      email: table.user.email,
+      phone: table.user.phone,
+      role: table.user.role,
+    })
 }
 
 export async function updateUser(userId: number, userData: UpdateUser) {
@@ -103,9 +112,21 @@ export async function updateUser(userId: number, userData: UpdateUser) {
       role: userData.role ? userData.role as 'admin' | 'user' : undefined,
     })
     .where(eq(table.user.id, userId))
-    .returning()
+    .returning({
+      id: table.user.id,
+      fullName: table.user.fullName,
+      email: table.user.email,
+      phone: table.user.phone,
+      role: table.user.role,
+    })
 }
 
 export async function deleteUser(userId: number) {
-  return db.delete(table.user).where(eq(table.user.id, userId)).returning()
+  return db.delete(table.user).where(eq(table.user.id, userId)).returning({
+    id: table.user.id,
+    fullName: table.user.fullName,
+    email: table.user.email,
+    phone: table.user.phone,
+    role: table.user.role,
+  })
 }
