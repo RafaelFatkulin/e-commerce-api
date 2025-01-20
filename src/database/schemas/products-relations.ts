@@ -1,7 +1,7 @@
 import { relations } from 'drizzle-orm'
 import { brands } from './brands'
 import { categories } from './category'
-import { products } from './producsts'
+import { products } from './products'
 
 export const productsRelations = relations(products, ({ one }) => ({
   brand: one(brands, {
