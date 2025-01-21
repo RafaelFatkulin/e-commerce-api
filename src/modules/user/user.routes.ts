@@ -31,6 +31,10 @@ const list = createRoute({
       getSuccessResponseSchema(z.array(userSelectSchema), true),
       'The list of users',
     ),
+    [HttpStatusCodes.BAD_REQUEST]: jsonContent(
+      errorResponseSchema,
+      'Error when getting a users',
+    ),
   },
 })
 
@@ -53,6 +57,10 @@ const getUser = createRoute({
     [HttpStatusCodes.NOT_FOUND]: jsonContent(
       errorResponseSchema,
       'User not found',
+    ),
+    [HttpStatusCodes.BAD_REQUEST]: jsonContent(
+      errorResponseSchema,
+      'Error when getting a user',
     ),
   },
 })

@@ -20,29 +20,49 @@ import {
 const getUserListHandler: AppRouteHandler<ListRoute> = async (c) => {
   const filter = c.req.valid('query')
 
-  const { data, meta } = await getUsers(filter)
+  try {
+    const { data, meta } = await getUsers(filter)
 
-  return c.json(
-    createSuccessResponse({
-      data,
-      meta,
-    }),
-  )
+    return c.json(
+      createSuccessResponse({
+        data,
+        meta,
+      }),
+      200,
+    )
+  }
+  catch {
+    return c.json(
+      createErrorResponse({ message: 'Ошибка при получении пользователей' }),
+      HttpStatusCodes.BAD_REQUEST,
+    )
+  }
 }
 
 const getUserHandler: AppRouteHandler<GetUserRoute> = async (c) => {
   const { id } = c.req.valid('param')
 
-  const user = await getUser(id)
+  try {
+    const user = await getUser(id)
 
-  if (!user) {
+    if (!user) {
+      return c.json(
+        createErrorResponse({ message: 'Пользователь не найден' }),
+        HttpStatusCodes.NOT_FOUND,
+      )
+    }
+
     return c.json(
-      createErrorResponse({ message: 'Пользователь не найден' }),
-      HttpStatusCodes.NOT_FOUND,
+      createSuccessResponse({ data: user }),
+      HttpStatusCodes.OK,
     )
   }
-
-  return c.json(createSuccessResponse({ data: user }), HttpStatusCodes.OK)
+  catch {
+    return c.json(
+      createErrorResponse({ message: 'Ошибка при получении пользователей' }),
+      HttpStatusCodes.BAD_REQUEST,
+    )
+  }
 }
 
 const createUserHandler: AppRouteHandler<CreateUserRoute> = async (c) => {

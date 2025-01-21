@@ -1,6 +1,7 @@
 import { configureOpenAPI } from '@lib/configure-open-api'
 import { createApp } from '@lib/create-app'
 import { auth } from '@modules/auth'
+import { category } from '@modules/category'
 import { core } from '@modules/core'
 import { user } from '@modules/user'
 
@@ -10,6 +11,7 @@ const routes = [
   core,
   user,
   auth,
+  category,
 ]
 
 configureOpenAPI(app)
