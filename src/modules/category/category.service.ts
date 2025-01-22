@@ -1,15 +1,34 @@
 import type { SQL } from 'drizzle-orm'
-import type { CategoriesFilter, Category, CreateCategory, UpdateCategory } from './category.type'
+import type {
+  CategoriesFilter,
+  Category,
+  CreateCategory,
+  UpdateCategory,
+} from './category.type'
 import { db } from '@database'
 import { table } from '@database/schemas'
 import { translit } from '@utils/translit'
-import cyrillicToTranslit from 'cyrillic-to-translit-js'
-import { eq, sql } from 'drizzle-orm'
+import { eq } from 'drizzle-orm'
 
 export async function getCategories(filter: CategoriesFilter) {
-  const { q, parent_id, page, per_page = '10', sort_by = 'id', sort_order = 'desc' } = filter
+  const {
+    q,
+    parent_id,
+    page,
+    per_page = '10',
+    sort_by = 'id',
+    sort_order = 'desc',
+  } = filter
 
-  const totalCount = await db.$count(table.categories, parent_id ? eq(table.categories.parentId, Number(parent_id)) : undefined)
+  const totalCount = await db.$count(
+    table.categories,
+    parent_id
+      ? eq(
+          table.categories.parentId,
+          Number(parent_id),
+        )
+      : undefined,
+  )
   const totalPages = Math.ceil(totalCount / Number(per_page))
 
   const categories = await db.query.categories.findMany({
