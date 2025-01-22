@@ -25,7 +25,7 @@ export function generatePassword(length: number = 12) {
 }
 
 export async function getUsers(filter: UsersFilter) {
-  const { q, page = '1', per_page = '10', sort_by = 'id', sort_order = 'desc', role } = filter
+  const { q, page, per_page = '10', sort_by = 'id', sort_order = 'desc', role } = filter
   const totalUsers = await db.$count(table.user)
   const totalPages = Math.ceil(totalUsers / Number(per_page))
 
