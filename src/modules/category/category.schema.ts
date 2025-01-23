@@ -31,9 +31,9 @@ export const categoryTreeSchema = z.object({
 
 export const categoriesFilterSchema = z.object({
   q: z.string().optional().openapi('Search string'),
-  parent_id: z.string().optional().openapi('Parent category id'),
-  page: z.string().optional(),
-  per_page: z.string().optional(),
+  parent_id: z.coerce.number().optional().openapi('Parent category id'),
+  page: z.coerce.number().optional(),
+  per_page: z.coerce.number().optional(),
   sort_by: categorySelectSchema.keyof().optional(),
   sort_order: z.enum(['asc', 'desc']).optional(),
 })

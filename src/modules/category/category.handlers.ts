@@ -45,7 +45,7 @@ const get: AppRouteHandler<GetRoute> = async (c) => {
   const { id } = c.req.valid('param')
 
   try {
-    const category = await getCategoryById(id).catch(console.error)
+    const category = await getCategoryById(id)
 
     if (!category) {
       return c.json(
@@ -108,7 +108,7 @@ const update: AppRouteHandler<UpdateRoute> = async (c) => {
   if (!existingCategory) {
     return c.json(
       createErrorResponse({
-        message: 'Категория не существует',
+        message: 'Категория не найдена',
       }),
       HttpStatusCodes.NOT_FOUND,
     )

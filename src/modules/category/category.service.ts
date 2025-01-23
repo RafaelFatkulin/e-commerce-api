@@ -15,7 +15,7 @@ export async function getCategories(filter: CategoriesFilter) {
     q,
     parent_id,
     page,
-    per_page = '10',
+    per_page = 10,
     sort_by = 'id',
     sort_order = 'desc',
   } = filter
@@ -25,11 +25,11 @@ export async function getCategories(filter: CategoriesFilter) {
     parent_id
       ? eq(
           table.categories.parentId,
-          Number(parent_id),
+          parent_id,
         )
       : undefined,
   )
-  const totalPages = Math.ceil(totalCount / Number(per_page))
+  const totalPages = Math.ceil(totalCount / per_page)
 
   const categories = await db.query.categories.findMany({
     where(fields, { ilike, eq, or }) {
@@ -38,7 +38,7 @@ export async function getCategories(filter: CategoriesFilter) {
         conditions.push(ilike(fields.title, `%${q.toLowerCase()}%`))
       }
       if (parent_id) {
-        conditions.push(eq(fields.parentId, Number(parent_id)))
+        conditions.push(eq(fields.parentId, parent_id))
       }
       return conditions.length ? or(...conditions) : undefined
     },
@@ -47,8 +47,8 @@ export async function getCategories(filter: CategoriesFilter) {
         ? operators.asc(fields[sort_by])
         : operators.desc(fields[sort_by])
     },
-    limit: Number(per_page),
-    offset: (Number(page) - 1) * Number(per_page),
+    limit: page ? per_page : undefined,
+    offset: page ? (page - 1) * per_page : undefined,
   })
 
   return {
@@ -57,8 +57,8 @@ export async function getCategories(filter: CategoriesFilter) {
       ? {
           total: totalCount,
           totalPages,
-          limit: Number(per_page),
-          page: Number(page),
+          limit: per_page,
+          page,
         }
       : undefined,
   }
