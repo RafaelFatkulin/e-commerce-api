@@ -5,6 +5,7 @@ import { brand } from '@modules/brand'
 import { category } from '@modules/category'
 import { core } from '@modules/core'
 import { user } from '@modules/user'
+import { serveStatic } from 'hono/bun'
 
 export const app = createApp()
 
@@ -21,6 +22,8 @@ configureOpenAPI(app)
 routes.forEach((route) => {
   app.route('/', route)
 })
+
+app.use('/static/*', serveStatic({ root: './' }))
 
 app.openAPIRegistry.registerComponent('securitySchemes', 'Bearer', {
   type: 'http',

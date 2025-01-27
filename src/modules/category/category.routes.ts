@@ -91,11 +91,11 @@ const create = createRoute({
     ),
     [HttpStatusCodes.BAD_REQUEST]: jsonContent(
       errorResponseSchema,
-      'Error when creating a Category',
+      'Error when creating a category',
     ),
     [HttpStatusCodes.UNPROCESSABLE_ENTITY]: jsonContent(
       errorResponseSchema,
-      'Error when creating a Category',
+      'Error when creating a category',
     ),
   },
 })

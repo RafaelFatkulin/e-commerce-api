@@ -9,11 +9,11 @@ export const categorySchema = categorySelectSchema.extend({
 }).openapi('Category schema')
 export const categoryCreateSchema = createInsertSchema(table.categories, {
   title: stringField(3, 128),
-  slug: stringField().optional().nullable(),
-  description: stringField(20).nullable(),
-  parentId: z.number().nullable(),
-  order: z.number().min(1, 'Минимальное значение поля - 1').nullable(),
-  isActive: z.boolean().nullable(),
+  slug: stringField().optional().nullable().optional(),
+  description: stringField(20).nullable().optional(),
+  parentId: z.number().nullable().optional(),
+  order: z.number().min(1, 'Минимальное значение поля - 1').nullable().optional(),
+  isActive: z.boolean().nullable().optional(),
 }).openapi('Category create schema')
 export const categoryUpdateSchema = createUpdateSchema(table.categories).openapi('Category update schema')
 
@@ -31,9 +31,9 @@ export const categoryTreeSchema = z.object({
 
 export const categoriesFilterSchema = z.object({
   q: z.string().optional().openapi('Search string'),
-  parent_id: z.string().optional().openapi('Parent category id'),
-  page: z.string().optional(),
-  per_page: z.string().optional(),
+  parent_id: z.coerce.number().optional().openapi('Parent category id'),
+  page: z.coerce.number().optional(),
+  per_page: z.coerce.number().optional(),
   sort_by: categorySelectSchema.keyof().optional(),
   sort_order: z.enum(['asc', 'desc']).optional(),
 })

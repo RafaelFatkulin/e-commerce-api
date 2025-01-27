@@ -1,7 +1,8 @@
-import type { SQL } from 'drizzle-orm'
-import type { BrandsFIlter } from './brand.types'
+import type { BrandsFIlter, CreateBrand, UpdateBrand } from './brand.types'
 import { db } from '@database'
 import { table } from '@database/schemas'
+import { translit } from '@utils/translit'
+import { eq, type SQL } from 'drizzle-orm'
 
 export async function getBrands(filter: BrandsFIlter) {
   const {
@@ -44,4 +45,47 @@ export async function getBrands(filter: BrandsFIlter) {
         }
       : undefined,
   }
+}
+
+export async function getBrandById(brandId: number) {
+  return db.query.brands.findFirst({
+    where({ id }, { eq }) {
+      return eq(id, brandId)
+    },
+  })
+}
+
+export async function getBrandByTitle(brandTitle: string) {
+  return db.query.brands.findFirst({
+    where({ title }, { eq }) {
+      return eq(title, brandTitle)
+    },
+  })
+}
+
+export async function createBrand(data: CreateBrand) {
+  return db.insert(table.brands).values({
+    ...data,
+    slug: translit(data.title.toLowerCase()),
+    order: data.order || 1,
+    isActive: data.isActive || true,
+  }).returning()
+}
+
+export async function updateBrand(brandId: number, data: UpdateBrand) {
+  return db
+    .update(table.brands)
+    .set({
+      ...data,
+      ...(data.title && { slug: translit(data.title.toLowerCase()) }),
+    })
+    .where(eq(table.brands.id, brandId))
+    .returning()
+}
+
+export async function deleteBrand(brandId: number) {
+  return db
+    .delete(table.brands)
+    .where(eq(table.brands.id, brandId))
+    .returning()
 }

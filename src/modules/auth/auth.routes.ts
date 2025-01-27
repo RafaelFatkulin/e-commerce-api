@@ -1,7 +1,7 @@
 import { jsonContent } from '@helpers/json-content'
 import { jsonContentRequired } from '@helpers/json-content-required'
 import { createRoute, z } from '@hono/zod-openapi'
-import { userUpdateSchema } from '@modules/user/user.schema'
+import { userSelectSchema, userUpdateSchema } from '@modules/user/user.schema'
 import { errorResponseSchema, getSuccessResponseSchema } from '@utils/response'
 import { HttpStatusCodes } from '@utils/status-codes'
 import { authMiddleware } from './auth.middleware'
@@ -107,7 +107,7 @@ const profile = createRoute({
   }],
   responses: {
     [HttpStatusCodes.OK]: jsonContent(
-      getSuccessResponseSchema(),
+      getSuccessResponseSchema(userSelectSchema),
       'Profile info',
     ),
     [HttpStatusCodes.UNAUTHORIZED]: jsonContent(
