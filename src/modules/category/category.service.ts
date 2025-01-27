@@ -16,6 +16,7 @@ export async function getCategories(filter: CategoriesFilter) {
     parent_id,
     page,
     per_page = 10,
+    per_page = 10,
     sort_by = 'id',
     sort_order = 'desc',
   } = filter
@@ -26,9 +27,11 @@ export async function getCategories(filter: CategoriesFilter) {
       ? eq(
           table.categories.parentId,
           parent_id,
+          parent_id,
         )
       : undefined,
   )
+  const totalPages = Math.ceil(totalCount / per_page)
   const totalPages = Math.ceil(totalCount / per_page)
 
   const categories = await db.query.categories.findMany({
