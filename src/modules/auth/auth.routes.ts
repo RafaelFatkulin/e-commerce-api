@@ -22,7 +22,9 @@ const signup = createRoute({
         z.object({
           accessToken: z.string(),
           refreshToken: z.string(),
-          expiresAt: z.date(),
+          accessExpiresAt: z.date(),
+          refreshExpiresAt: z.date(),
+          user: userSelectSchema,
         }),
       ),
       'Signup successfull',
@@ -47,7 +49,9 @@ const signin = createRoute({
         z.object({
           accessToken: z.string(),
           refreshToken: z.string(),
-          expiresAt: z.date(),
+          accessExpiresAt: z.date(),
+          refreshExpiresAt: z.date(),
+          user: userSelectSchema,
         }),
       ),
       'Signin successfull',
@@ -68,7 +72,15 @@ const signout = createRoute({
   },
   responses: {
     [HttpStatusCodes.OK]: jsonContent(
-      getSuccessResponseSchema(),
+      getSuccessResponseSchema(
+        z.object({
+          accessToken: z.string(),
+          refreshToken: z.string(),
+          accessExpiresAt: z.date(),
+          refreshExpiresAt: z.date(),
+          user: userSelectSchema,
+        }),
+      ),
       'Signout successfull',
     ),
     [HttpStatusCodes.UNAUTHORIZED]: jsonContent(

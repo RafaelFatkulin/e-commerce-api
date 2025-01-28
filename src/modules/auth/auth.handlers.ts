@@ -20,7 +20,7 @@ const signup: AppRouteHandler<SignupRoute> = async (c) => {
 
   const [user] = await createUser({
     ...data,
-    role: 'admin',
+    role: 'user',
   })
 
   if (!user) {
@@ -30,7 +30,7 @@ const signup: AppRouteHandler<SignupRoute> = async (c) => {
     )
   }
 
-  const { at, rt, rtExpiresAt } = await generateTokens(user.id, user.role)
+  const { at, rt, rtExpiresAt, atExpiresAt } = await generateTokens(user.id, user.role)
 
   await createRefreshToken({
     token: rt,
@@ -44,7 +44,8 @@ const signup: AppRouteHandler<SignupRoute> = async (c) => {
       data: {
         accessToken: at,
         refreshToken: rt,
-        expiresAt: rtExpiresAt,
+        accessExpiresAt: atExpiresAt,
+        refreshExpiresAt: rtExpiresAt,
       },
     }),
     201,
@@ -77,7 +78,7 @@ const signin: AppRouteHandler<SigninRoute> = async (c) => {
     )
   }
 
-  const { at, rt, rtExpiresAt } = await generateTokens(user.id, user.role)
+  const { at, rt, atExpiresAt, rtExpiresAt } = await generateTokens(user.id, user.role)
 
   await createRefreshToken({
     token: rt,
@@ -91,7 +92,9 @@ const signin: AppRouteHandler<SigninRoute> = async (c) => {
       data: {
         accessToken: at,
         refreshToken: rt,
-        expiresAt: rtExpiresAt,
+        accessExpiresAt: atExpiresAt,
+        refreshExpiresAt: rtExpiresAt,
+        user,
       },
     }),
     200,
@@ -157,6 +160,7 @@ const refresh: AppRouteHandler<RefreshTokenRoute> = async (c) => {
     at,
     rt: newRefreshToken,
     rtExpiresAt,
+    atExpiresAt,
   } = await generateTokens(user.id, user.role)
 
   await revokeRefreshToken(existingRefreshToken.id)
@@ -169,7 +173,19 @@ const refresh: AppRouteHandler<RefreshTokenRoute> = async (c) => {
 
   return c.json(
     createSuccessResponse({
-      data: { accessToken: at, refreshToken: newRefreshToken, expiresAt: rtExpiresAt },
+      data: {
+        accessToken: at,
+        refreshToken: newRefreshToken,
+        accessExpiresAt: atExpiresAt,
+        refreshExpiresAt: rtExpiresAt,
+        user: {
+          id: user.id,
+          fullName: user.fullName,
+          email: user.email,
+          phone: user.phone,
+          role: user.role,
+        },
+      },
     }),
     200,
   )
