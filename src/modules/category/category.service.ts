@@ -84,17 +84,17 @@ export async function getCategoryByTitle(categoryTitle: string) {
 }
 
 export async function getCategoriesTree(categoryId?: number) {
-  const categories = await getCategories({})
+  const categories = await db.query.categories.findMany()
 
   const categoryMap = new Map()
 
-  categories.data.forEach((category) => {
+  categories.forEach((category) => {
     categoryMap.set(category.id, { ...category, categories: [] })
   })
 
   const tree: Category[] = []
 
-  categories.data.forEach((category) => {
+  categories.forEach((category) => {
     if (category.parentId === null) {
       tree.push(categoryMap.get(category.id))
     }
@@ -105,6 +105,9 @@ export async function getCategoriesTree(categoryId?: number) {
       }
     }
   })
+
+  console.log(categoryMap);
+  
 
   if (categoryId) {
     const category = categoryMap.get(categoryId)
