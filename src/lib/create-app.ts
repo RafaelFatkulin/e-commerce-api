@@ -10,6 +10,8 @@ export function createRouter() {
     strict: false,
     defaultHook: (result, c) => {
       if (!result.success) {
+        console.log(result);
+        
         return c.json(
           createErrorResponse({
             errors: result.error.format(),
@@ -42,6 +44,8 @@ export function createApp() {
   });
 
   app.onError((err, c) => {
+    console.log(err);
+    
     if (err instanceof HTTPException) {
       const status = err.getResponse().status;
 

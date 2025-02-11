@@ -4,7 +4,7 @@ import { createRoute, z } from '@hono/zod-openapi'
 import { authMiddleware } from '@modules/auth/auth.middleware'
 import { errorResponseSchema, getSuccessResponseSchema } from '@utils/response'
 import { HttpStatusCodes } from '@utils/status-codes'
-import { IdParamsSchema } from '@utils/zod'
+import { IdParamsSchema, SlugParamsSchema } from '@utils/zod'
 import { categoriesFilterSchema, categoryCreateSchema, categorySchema, categorySelectSchema, categoryTreeSchema, categoryUpdateSchema } from './category.schema'
 
 const basePath = '/categories'
@@ -60,6 +60,29 @@ const get = createRoute({
   responses: {
     [HttpStatusCodes.OK]: jsonContent(
       getSuccessResponseSchema(categorySchema),
+      'Category successfully found',
+    ),
+    [HttpStatusCodes.NOT_FOUND]: jsonContent(
+      errorResponseSchema,
+      'Category not found',
+    ),
+    [HttpStatusCodes.BAD_REQUEST]: jsonContent(
+      errorResponseSchema,
+      'Error when getting a category',
+    ),
+  },
+})
+
+const getBySlug = createRoute({
+  tags,
+  path: basePath.concat('/slug/{slug}'),
+  method: 'get',
+  request: {
+    params: SlugParamsSchema
+  },
+  responses: {
+    [HttpStatusCodes.OK]: jsonContent(
+      getSuccessResponseSchema(categorySelectSchema),
       'Category successfully found',
     ),
     [HttpStatusCodes.NOT_FOUND]: jsonContent(
@@ -159,6 +182,7 @@ export const routes = {
   list,
   tree,
   get,
+  getBySlug,
   create,
   update,
   delete: deleteCategory,
@@ -167,6 +191,7 @@ export const routes = {
 export type ListRoute = typeof list
 export type TreeRoute = typeof tree
 export type GetRoute = typeof get
+export type GetBySlugRoute = typeof getBySlug
 export type CreateRoute = typeof create
 export type UpdateRoute = typeof update
 export type DeleteRoute = typeof deleteCategory

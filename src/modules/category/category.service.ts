@@ -83,6 +83,14 @@ export async function getCategoryByTitle(categoryTitle: string) {
   })
 }
 
+export async function getCategoryBySlug(categorySlug: string) {
+  return db.query.categories.findFirst({
+    where({slug}, {eq}) {
+      return eq(slug, categorySlug)
+    }
+  })
+}
+
 export async function getCategoriesTree(categoryId?: number) {
   const categories = await db.query.categories.findMany()
 
@@ -123,6 +131,7 @@ export async function getCategoriesTree(categoryId?: number) {
 export async function createCategory(data: CreateCategory) {
   return db.insert(table.categories).values({
     ...data,
+    shortTitle: data.shortTitle || data.title,
     slug: translit(data.title.toLowerCase()),
     order: data.order || 1,
     isActive: data.isActive || true,

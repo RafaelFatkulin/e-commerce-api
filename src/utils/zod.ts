@@ -56,3 +56,14 @@ export const IdParamsSchema = z.object({
     example: 42,
   }),
 })
+
+export const SlugParamsSchema = z.object({
+  slug: z.string().min(1).openapi({
+    param: {
+      name: 'slug',
+      in: 'path',
+      required: true,
+    },
+    required: ['slug']
+  })
+})

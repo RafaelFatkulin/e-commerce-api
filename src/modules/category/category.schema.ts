@@ -8,6 +8,7 @@ export const categorySchema = categorySelectSchema.extend({
   categories: z.array(categorySelectSchema).optional(),
 }).openapi('Category schema')
 export const categoryCreateSchema = createInsertSchema(table.categories, {
+  shortTitle: stringField(3, 128).optional(),
   title: stringField(3, 128),
   slug: stringField().optional().nullable().optional(),
   description: stringField(20).nullable().optional(),

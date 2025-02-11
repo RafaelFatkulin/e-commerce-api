@@ -1,8 +1,8 @@
 import type { AppRouteHandler } from 'types'
-import type { CreateRoute, DeleteRoute, GetRoute, ListRoute, TreeRoute, UpdateRoute } from './category.routes'
+import type { CreateRoute, DeleteRoute, GetBySlugRoute, GetRoute, ListRoute, TreeRoute, UpdateRoute } from './category.routes'
 import { createErrorResponse, createSuccessResponse } from '@utils/response'
 import { HttpStatusCodes } from '@utils/status-codes'
-import { createCategory, deleteCategory, getCategories, getCategoriesTree, getCategoryById, getCategoryByTitle, updateCategory } from './category.service'
+import { createCategory, deleteCategory, getCategories, getCategoriesTree, getCategoryById, getCategoryBySlug, getCategoryByTitle, updateCategory } from './category.service'
 
 const list: AppRouteHandler<ListRoute> = async (c) => {
   const filters = c.req.valid('query')
@@ -46,6 +46,32 @@ const get: AppRouteHandler<GetRoute> = async (c) => {
 
   try {
     const category = await getCategoryById(id)
+
+    if (!category) {
+      return c.json(
+        createErrorResponse({ message: 'Категория не найдена' }),
+        HttpStatusCodes.NOT_FOUND,
+      )
+    }
+
+    return c.json(
+      createSuccessResponse({ data: category }),
+      HttpStatusCodes.OK,
+    )
+  }
+  catch {
+    return c.json(
+      createErrorResponse({ message: 'Ошибка при получении категории' }),
+      HttpStatusCodes.BAD_REQUEST,
+    )
+  }
+}
+
+const getBySlug: AppRouteHandler<GetBySlugRoute> = async (c) => {
+  const { slug } = c.req.valid('param')
+  console.log('Received slug:', slug);
+  try {
+    const category = await getCategoryBySlug(slug)
 
     if (!category) {
       return c.json(
@@ -171,6 +197,7 @@ export const handlers = {
   list,
   tree,
   get,
+  getBySlug,
   create,
   update,
   delete: deleteCategoryHandler,
