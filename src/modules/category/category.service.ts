@@ -24,14 +24,17 @@ export async function getCategories(filter: CategoriesFilter) {
     table.categories,
     parent_id
       ? eq(
-          table.categories.parentId,
-          parent_id,
-        )
+        table.categories.parentId,
+        parent_id,
+      )
       : undefined,
   )
   const totalPages = Math.ceil(totalCount / per_page)
 
   const categories = await db.query.categories.findMany({
+    with: {
+      categories: true
+    },
     where(fields, { ilike, eq, or, isNull }) {
       const conditions: SQL[] = []
       if (q) {
@@ -58,11 +61,11 @@ export async function getCategories(filter: CategoriesFilter) {
     data: categories,
     meta: page
       ? {
-          total: totalCount,
-          totalPages,
-          limit: per_page,
-          page,
-        }
+        total: totalCount,
+        totalPages,
+        limit: per_page,
+        page,
+      }
       : undefined,
   }
 }
@@ -85,7 +88,7 @@ export async function getCategoryByTitle(categoryTitle: string) {
 
 export async function getCategoryBySlug(categorySlug: string) {
   return db.query.categories.findFirst({
-    where({slug}, {eq}) {
+    where({ slug }, { eq }) {
       return eq(slug, categorySlug)
     }
   })
@@ -115,7 +118,7 @@ export async function getCategoriesTree(categoryId?: number) {
   })
 
   console.log(categoryMap);
-  
+
 
   if (categoryId) {
     const category = categoryMap.get(categoryId)
