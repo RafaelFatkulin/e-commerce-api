@@ -20,6 +20,9 @@ export async function getCategories(filter: CategoriesFilter) {
     sort_order = 'desc',
   } = filter
 
+  console.log('@filter', filter);
+
+
   const totalCount = await db.$count(
     table.categories,
     parent_id
@@ -33,20 +36,26 @@ export async function getCategories(filter: CategoriesFilter) {
 
   const categories = await db.query.categories.findMany({
     with: {
-      categories: true
+      // categories: true
     },
-    where(fields, { ilike, eq, or, isNull }) {
+    where(fields, { ilike, eq, or, isNull, and }) {
       const conditions: SQL[] = []
       if (q) {
-        conditions.push(ilike(fields.title, `%${q.toLowerCase()}%`))
+        const searchQuery = q.trim().toLowerCase()
+        conditions.push(
+          or(
+            ilike(fields.title, `%${searchQuery}%`),
+            ilike(fields.shortTitle, `%${searchQuery}%`)
+          ) as SQL
+        )
       }
-      if (parent_id) {
+      if (parent_id !== undefined) {
         conditions.push(eq(fields.parentId, parent_id))
-      }
-      if (!parent_id) {
+      } else {
         conditions.push(isNull(fields.parentId))
       }
-      return conditions.length ? or(...conditions) : undefined
+
+      return conditions.length ? and(...conditions) : undefined
     },
     orderBy(fields, operators) {
       return sort_order === 'asc'
@@ -56,6 +65,9 @@ export async function getCategories(filter: CategoriesFilter) {
     limit: page ? per_page : undefined,
     offset: page ? (page - 1) * per_page : undefined,
   })
+
+  console.log('@categories', categories);
+
 
   return {
     data: categories,
