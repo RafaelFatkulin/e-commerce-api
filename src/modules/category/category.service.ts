@@ -8,7 +8,7 @@ import type {
 import { db } from '@database'
 import { table } from '@database/schemas'
 import { translit } from '@utils/translit'
-import { eq } from 'drizzle-orm'
+import { and, eq, ilike, isNull, or } from 'drizzle-orm'
 
 export async function getCategories(filter: CategoriesFilter) {
   const {
@@ -20,17 +20,32 @@ export async function getCategories(filter: CategoriesFilter) {
     sort_order = 'desc',
   } = filter
 
-  console.log('@filter', filter);
+  const whereConditions = (() => {
+    const conditions: SQL[] = []
 
+    const fields = table.categories
+
+    if (q) {
+      const searchQuery = q.trim().toLowerCase()
+      conditions.push(
+        or(
+          ilike(fields.title, `%${searchQuery}%`),
+          ilike(fields.shortTitle, `%${searchQuery}%`)
+        ) as SQL
+      )
+    }
+    if (parent_id !== undefined) {
+      conditions.push(eq(fields.parentId, parent_id))
+    } else {
+      conditions.push(isNull(fields.parentId))
+    }
+
+    return conditions.length ? and(...conditions) : undefined
+  })()
 
   const totalCount = await db.$count(
     table.categories,
-    parent_id
-      ? eq(
-        table.categories.parentId,
-        parent_id,
-      )
-      : undefined,
+    whereConditions
   )
   const totalPages = Math.ceil(totalCount / per_page)
 
@@ -38,25 +53,7 @@ export async function getCategories(filter: CategoriesFilter) {
     with: {
       // categories: true
     },
-    where(fields, { ilike, eq, or, isNull, and }) {
-      const conditions: SQL[] = []
-      if (q) {
-        const searchQuery = q.trim().toLowerCase()
-        conditions.push(
-          or(
-            ilike(fields.title, `%${searchQuery}%`),
-            ilike(fields.shortTitle, `%${searchQuery}%`)
-          ) as SQL
-        )
-      }
-      if (parent_id !== undefined) {
-        conditions.push(eq(fields.parentId, parent_id))
-      } else {
-        conditions.push(isNull(fields.parentId))
-      }
-
-      return conditions.length ? and(...conditions) : undefined
-    },
+    where: whereConditions,
     orderBy(fields, operators) {
       return sort_order === 'asc'
         ? operators.asc(fields[sort_by])
@@ -128,9 +125,6 @@ export async function getCategoriesTree(categoryId?: number) {
       }
     }
   })
-
-  console.log(categoryMap);
-
 
   if (categoryId) {
     const category = categoryMap.get(categoryId)
