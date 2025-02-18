@@ -1,6 +1,7 @@
 import { table } from '@database/schemas'
+import { categoryStatus } from '@database/schemas/category'
 import { z } from '@hono/zod-openapi'
-import { stringField } from '@utils/zod'
+import { enumField, stringField } from '@utils/zod'
 import { createInsertSchema, createSelectSchema, createUpdateSchema } from 'drizzle-zod'
 
 export const categorySelectSchema = createSelectSchema(table.categories).openapi('Category schema')
@@ -14,7 +15,7 @@ export const categoryCreateSchema = createInsertSchema(table.categories, {
   description: stringField(20).nullable().optional(),
   parentId: z.number().nullable().optional(),
   order: z.number().min(1, 'Минимальное значение поля - 1').nullable().optional(),
-  isActive: z.boolean().nullable().optional(),
+  status: enumField(categoryStatus.enumValues).optional().openapi({ examples: categoryStatus.enumValues }),
 }).openapi('Category create schema')
 export const categoryUpdateSchema = createUpdateSchema(table.categories).openapi('Category update schema')
 

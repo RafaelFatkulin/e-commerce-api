@@ -143,7 +143,7 @@ export async function createCategory(data: CreateCategory) {
     shortTitle: data.shortTitle || data.title,
     slug: translit(data.title.toLowerCase()),
     order: data.order || 1,
-    isActive: data.isActive || true,
+    status: data.status as Category['status'] || 'not-active',
   }).returning()
 }
 
