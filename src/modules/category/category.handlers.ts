@@ -129,6 +129,7 @@ const create: AppRouteHandler<CreateRoute> = async (c) => {
 const update: AppRouteHandler<UpdateRoute> = async (c) => {
   const { id } = c.req.valid('param')
   const data = c.req.valid('json')
+
   const existingCategory = await getCategoryById(id)
 
   if (!existingCategory) {
@@ -138,6 +139,19 @@ const update: AppRouteHandler<UpdateRoute> = async (c) => {
       }),
       HttpStatusCodes.NOT_FOUND,
     )
+  }
+
+  if (data.title) {
+    const categoryWithTitle = await getCategoryByTitle(data.title)
+
+    if (categoryWithTitle) {
+      return c.json(
+        createErrorResponse({
+          message: 'Категория с таким названием уже существует',
+        }),
+        HttpStatusCodes.BAD_REQUEST,
+      )
+    }
   }
 
   try {
@@ -151,7 +165,7 @@ const update: AppRouteHandler<UpdateRoute> = async (c) => {
       HttpStatusCodes.OK,
     )
   }
-  catch {
+  catch (error) {
     return c.json(
       createErrorResponse({
         message: 'Ошибка при редактировании категории',
