@@ -144,7 +144,7 @@ const update: AppRouteHandler<UpdateRoute> = async (c) => {
   if (data.title) {
     const categoryWithTitle = await getCategoryByTitle(data.title)
 
-    if (categoryWithTitle) {
+    if (categoryWithTitle && categoryWithTitle.id !== id) {
       return c.json(
         createErrorResponse({
           message: 'Категория с таким названием уже существует',
