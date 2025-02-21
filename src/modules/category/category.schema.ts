@@ -9,10 +9,10 @@ export const categorySchema = categorySelectSchema.extend({
   categories: z.array(categorySelectSchema).optional(),
 }).openapi('Category schema')
 export const categoryCreateSchema = createInsertSchema(table.categories, {
-  shortTitle: stringField(5, 128).optional(),
-  title: stringField(5, 128),
+  shortTitle: stringField(4, 128).optional(),
+  title: stringField(4, 128),
   slug: stringField().optional().nullable().optional(),
-  description: stringField(20).nullable().optional(),
+  description: stringField().nullable().optional(),
   parentId: z.number().nullable().optional(),
   order: z.number().min(1, 'Минимальное значение поля - 1').nullable().optional(),
   status: enumField(categoryStatus.enumValues).optional().openapi({ examples: categoryStatus.enumValues }),
@@ -22,12 +22,12 @@ export const categoryUpdateSchema = createUpdateSchema(table.categories).openapi
 export const categoryTreeSchema = z.object({
   tree: z.ostring().transform((value) => {
     if (value === undefined)
-      return undefined // Keep it optional
+      return undefined
     if (value === 'true')
       return true
     if (value === 'false')
       return false
-    throw new Error('Invalid boolean value') // For unexpected values
+    throw new Error('Invalid boolean value')
   }),
 })
 

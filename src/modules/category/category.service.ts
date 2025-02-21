@@ -103,6 +103,10 @@ export async function getCategoryBySlug(categorySlug: string) {
   })
 }
 
+export async function getCategoryChildCount(categoryId: number) {
+  return db.$count(table.categories, eq(table.categories.parentId, categoryId))
+}
+
 export async function getCategoriesTree(categoryId?: number) {
   const categories = await db.query.categories.findMany()
 

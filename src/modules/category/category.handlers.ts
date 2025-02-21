@@ -2,7 +2,7 @@ import type { AppRouteHandler } from 'types'
 import type { CreateRoute, DeleteRoute, GetBySlugRoute, GetRoute, ListRoute, TreeRoute, UpdateRoute } from './category.routes'
 import { createErrorResponse, createSuccessResponse } from '@utils/response'
 import { HttpStatusCodes } from '@utils/status-codes'
-import { createCategory, deleteCategory, getCategories, getCategoriesTree, getCategoryById, getCategoryBySlug, getCategoryByTitle, updateCategory } from './category.service'
+import { createCategory, deleteCategory, getCategories, getCategoriesTree, getCategoryById, getCategoryBySlug, getCategoryByTitle, getCategoryChildCount, updateCategory } from './category.service'
 
 const list: AppRouteHandler<ListRoute> = async (c) => {
   const filters = c.req.valid('query')
@@ -188,12 +188,21 @@ const deleteCategoryHandler: AppRouteHandler<DeleteRoute> = async (c) => {
     )
   }
 
+  const childCount = await getCategoryChildCount(id)
+
+  if (childCount > 0) {
+    return c.json(
+      createErrorResponse({ message: `Категория "${existingCategory.title}" не может быть удалена пока у нее есть хотя бы одна подкатегория` }),
+      HttpStatusCodes.BAD_REQUEST,
+    )
+  }
+
   try {
     const [category] = await deleteCategory(id)
 
     return c.json(
       createSuccessResponse({
-        message: `Категория "${category.title}" удален`,
+        message: `Категория "${category.title}" удалена  `,
         data: category,
       }),
       HttpStatusCodes.OK,

@@ -1,3 +1,7 @@
+import { brandsMediaRelations } from './brands-media-relations';
+import { brandsMedia } from './brands-media';
+import { mediaRelations } from './media-relations';
+import { media } from './media';
 import { brands } from './brands'
 import { brandsRelations } from './brands-relations'
 import { categoriesRelations } from './categories-relations'
@@ -12,6 +16,8 @@ import { userRelations } from './user-relations'
 export {
   brands,
   brandsRelations,
+  brandsMedia,
+  brandsMediaRelations,
   categories,
   categoriesRelations,
   products,
@@ -20,6 +26,8 @@ export {
   refreshTokenRelations,
   user,
   userRelations,
+  media,
+  mediaRelations,
 }
 
 export const table = {
@@ -31,8 +39,12 @@ export const table = {
   productsRelations,
   brands,
   brandsRelations,
+  brandsMedia,
+  brandsMediaRelations,
   categories,
   categoriesRelations,
+  media,
+  mediaRelations,
 } as const
 
 export type Table = typeof table

@@ -1,4 +1,6 @@
-import { boolean, integer, pgTable, text, varchar } from 'drizzle-orm/pg-core'
+import { integer, pgEnum, pgTable, text, varchar } from 'drizzle-orm/pg-core'
+
+export const brandStatus = pgEnum('brand_status', ['active', 'not-active'])
 
 export const brands = pgTable('brands', {
   id: integer().generatedAlwaysAsIdentity().primaryKey(),
@@ -6,5 +8,5 @@ export const brands = pgTable('brands', {
   slug: varchar('slug', { length: 255 }).notNull().unique(),
   description: text('description'),
   order: integer('order').default(0),
-  isActive: boolean('is_active').default(true),
+  status: brandStatus('status').default('active').notNull(),
 })

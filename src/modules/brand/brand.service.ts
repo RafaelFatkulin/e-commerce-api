@@ -4,6 +4,7 @@ import { table } from '@database/schemas'
 import { translit } from '@utils/translit'
 import { eq, type SQL } from 'drizzle-orm'
 
+
 export async function getBrands(filter: BrandsFIlter) {
   const {
     q,
@@ -30,6 +31,9 @@ export async function getBrands(filter: BrandsFIlter) {
         ? operators.asc(fields[sort_by])
         : operators.desc(fields[sort_by])
     },
+    with: {
+      media: true
+    },
     limit: page ? per_page : undefined,
     offset: page ? (page - 1) * per_page : undefined,
   })
@@ -38,11 +42,11 @@ export async function getBrands(filter: BrandsFIlter) {
     data: brands,
     meta: page
       ? {
-          total: totalCount,
-          totalPages,
-          limit: per_page,
-          page,
-        }
+        total: totalCount,
+        totalPages,
+        limit: per_page,
+        page,
+      }
       : undefined,
   }
 }
