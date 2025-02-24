@@ -13,3 +13,6 @@ export const mediaCreateSchema = createInsertSchema(table.media, {
     status: enumField(mediaStatus.enumValues).openapi({ examples: mediaStatus.enumValues })
 }).openapi('Media create schema')
 export const mediaUpdateSchema = createUpdateSchema(table.media).openapi('Media update schema')
+export const mediaSourceSchema = z.enum(['brand', 'product', 'category'])
+export const mediaTypeSchema = createSelectSchema(mediaType)
+export const mediaStatusSchema = createSelectSchema(mediaStatus)

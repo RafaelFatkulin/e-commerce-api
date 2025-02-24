@@ -60,7 +60,17 @@ export const routes = {
     path: paths.create(),
     method: 'post',
     request: {
-      body: jsonContentRequired(brandCreateSchema, 'Brand to create'),
+      body: {
+        content: {
+          'multipart/form-data': {
+            schema: z.object({
+              title: z.string().min(1, 'Title is required'),
+              description: z.string().optional(),
+              files: z.array(z.instanceof(File)).optional(),
+            }),
+          },
+        },
+      },
     },
     responses: {
       [HttpStatusCodes.CREATED]: jsonContent(

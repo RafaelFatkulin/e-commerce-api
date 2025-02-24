@@ -9,17 +9,17 @@ export const brandSelectSchema = createSelectSchema(table.brands)
 export const brandCreateSchema = createInsertSchema(table.brands, {
   title: stringField(3, 128),
   slug: stringField().optional().nullable(),
-  description: stringField().nullable(),
-  order: z.number().min(1, 'Минимальное значение поля - 1').nullable(),
-  isActive: z.boolean().nullable(),
+  description: stringField().nullable().optional(),
+  order: z.number().min(1, 'Минимальное значение поля - 1').nullable().optional(),
+  status: z.enum(['active', 'not-active']).nullable().optional(),
 }).openapi('Brand create schema')
 
 export const brandUpdateSchema = createUpdateSchema(table.brands, {
   title: stringField(3, 128).optional(),
   slug: stringField().optional(),
-  description: stringField().nullable().optional(),
-  order: z.number().min(1, 'Минимальное значение поля - 1').nullable().optional(),
-  isActive: z.boolean().nullable().optional(),
+  description: stringField().optional(),
+  order: z.number().min(1, 'Минимальное значение поля - 1').optional(),
+  status: z.enum(['active', 'not-active']).optional(),
 }).openapi('Brand update schema')
 
 export const brandsFilterSchema = z.object({

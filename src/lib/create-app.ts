@@ -38,7 +38,7 @@ export function createApp() {
       credentials: true,
     })
   );
-  app.use(logger());
+  // app.use(logger());
 
   app.notFound((c) => {
     return c.json(

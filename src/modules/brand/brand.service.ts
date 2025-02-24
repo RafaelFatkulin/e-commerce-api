@@ -72,7 +72,7 @@ export async function createBrand(data: CreateBrand) {
     ...data,
     slug: translit(data.title.toLowerCase()),
     order: data.order || 1,
-    isActive: data.isActive || true,
+    status: data.status || 'active',
   }).returning()
 }
 

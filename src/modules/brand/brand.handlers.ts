@@ -16,6 +16,10 @@ import {
   getBrands,
   updateBrand,
 } from './brand.service'
+import { getFilesArray } from '@utils/get-files-array'
+import { Media, uploadMedia } from '@modules/media'
+import { db } from '@database'
+import { table } from '@database/schemas'
 
 const list: AppRouteHandler<ListRoute> = async (c) => {
   const filters = c.req.valid('query')
@@ -62,37 +66,62 @@ const get: AppRouteHandler<GetRoute> = async (c) => {
 }
 
 const create: AppRouteHandler<CreateRoute> = async (c) => {
-  const data = c.req.valid('json')
+  const body = await c.req.formData();
+  const title = body.get('title') as string;
+  const description = body.get('description') as string | undefined;
 
-  const existingBrand = await getBrandByTitle(data.title)
+  const files = getFilesArray(body);
 
+  const data = {
+    title,
+    description,
+    ...(files.length > 0 && { files }),
+  };
+
+  const existingBrand = await getBrandByTitle(title);
   if (existingBrand) {
     return c.json(
       createErrorResponse({
-        message: `Бренд "${data.title}" уже существует`,
+        message: `Бренд "${title}" уже существует`,
       }),
-      HttpStatusCodes.BAD_REQUEST,
-    )
+      HttpStatusCodes.BAD_REQUEST
+    );
   }
 
   try {
-    const [brand] = await createBrand(data)
+    let mediaItems: Media[] = [];
+
+    if (files.length > 0) {
+      mediaItems = await uploadMedia('brand', files);
+    }
+
+    const [brand] = await createBrand(data);
+
+    if (mediaItems.length > 0) {
+      for (const item of mediaItems) {
+        await db.insert(table.brandsMedia).values({
+          brandId: brand.id,
+          mediaId: item.id
+        });
+      }
+    }
 
     return c.json(
       createSuccessResponse({
         message: `Бренд "${brand.title}" создан`,
         data: brand,
       }),
-      HttpStatusCodes.CREATED,
-    )
-  }
-  catch {
+      HttpStatusCodes.CREATED
+    );
+  } catch (error) {
     return c.json(
-      createErrorResponse({ message: 'Ошибка при создании бренда' }),
-      HttpStatusCodes.BAD_REQUEST,
-    )
+      createErrorResponse({
+        message: 'Ошибка при создании бренда',
+      }),
+      HttpStatusCodes.BAD_REQUEST
+    );
   }
-}
+};
 
 const update: AppRouteHandler<UpdateRoute> = async (c) => {
   const { id } = c.req.valid('param')
