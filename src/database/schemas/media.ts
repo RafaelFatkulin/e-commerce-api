@@ -8,7 +8,7 @@ export const media = pgTable('media', {
     type: mediaType('type').notNull(),
     path: varchar('path', { length: 255 }).notNull(),
     alt: varchar('alt', { length: 255 }),
-    order: integer('order').default(0),
+    order: integer('order').default(0).notNull(),
     status: mediaStatus('status').default('active').notNull()
 })
 

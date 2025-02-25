@@ -29,3 +29,5 @@ export const brandsFilterSchema = z.object({
   sort_by: brandSelectSchema.keyof().optional(),
   sort_order: z.enum(['asc', 'desc']).optional(),
 })
+
+export const brandsMediaSchema = createSelectSchema(table.brandsMedia)

@@ -14,7 +14,7 @@ export async function uploadMedia(source: MediaSource, files: File[]) {
 
             const item = await db.insert(table.media).values({
                 type: (file.type.startsWith('image') ? 'image' : 'video') as MediaType,
-                path: filePath,
+                path: `http://localhost:8000/uploads/${source}/${fileName}`,
                 order: index + 1,
                 status: 'active' as MediaStatus,
                 alt: file.name,
@@ -25,4 +25,18 @@ export async function uploadMedia(source: MediaSource, files: File[]) {
     );
 
     return mediaItems
+}
+
+export async function changeMediaOrder(source: MediaSource, id: number) {
+
+}
+
+export async function deleteMedia(path: string) {
+    const file = Bun.file(path)
+
+    if (!file.exists()) {
+        return
+    }
+
+    await file.unlink()
 }

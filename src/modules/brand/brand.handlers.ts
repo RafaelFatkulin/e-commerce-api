@@ -17,7 +17,7 @@ import {
   updateBrand,
 } from './brand.service'
 import { getFilesArray } from '@utils/get-files-array'
-import { Media, uploadMedia } from '@modules/media'
+import { deleteMedia, Media, uploadMedia } from '@modules/media'
 import { db } from '@database'
 import { table } from '@database/schemas'
 
@@ -173,6 +173,10 @@ const deleteHandler: AppRouteHandler<DeleteRoute> = async (c) => {
 
   try {
     const [brand] = await deleteBrand(id)
+
+    for (const media of existingBrand.media) {
+      deleteMedia(media.path)
+    }
 
     return c.json(
       createSuccessResponse({

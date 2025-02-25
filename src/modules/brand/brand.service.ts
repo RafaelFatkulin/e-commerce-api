@@ -1,11 +1,31 @@
-import type { BrandsFIlter, CreateBrand, UpdateBrand } from './brand.types'
+import type {
+  Brand,
+  BrandsFilter,
+  BrandWithMedia,
+  BrandWithMediaOnly,
+  CreateBrand,
+  UpdateBrand
+} from './brand.types'
 import { db } from '@database'
 import { table } from '@database/schemas'
 import { translit } from '@utils/translit'
 import { eq, type SQL } from 'drizzle-orm'
 
+function getMappedBrands(brands: BrandWithMedia[]): BrandWithMediaOnly[] {
+  return brands.map(brand => ({
+    ...brand,
+    media: brand.media.map(bm => bm.media).sort((a, b) => a.order - b.order),
+  }))
+}
 
-export async function getBrands(filter: BrandsFIlter) {
+function getMappedBrand(brand: BrandWithMedia): BrandWithMediaOnly {
+  return {
+    ...brand,
+    media: brand.media.map(bm => bm.media).sort((a, b) => a.order - b.order),
+  };
+}
+
+export async function getBrands(filter: BrandsFilter) {
   const {
     q,
     page,
@@ -32,14 +52,18 @@ export async function getBrands(filter: BrandsFIlter) {
         : operators.desc(fields[sort_by])
     },
     with: {
-      media: true
+      media: {
+        with: {
+          media: true
+        }
+      }
     },
     limit: page ? per_page : undefined,
     offset: page ? (page - 1) * per_page : undefined,
   })
 
   return {
-    data: brands,
+    data: getMappedBrands(brands),
     meta: page
       ? {
         total: totalCount,
@@ -52,11 +76,24 @@ export async function getBrands(filter: BrandsFIlter) {
 }
 
 export async function getBrandById(brandId: number) {
-  return db.query.brands.findFirst({
+  const brand = await db.query.brands.findFirst({
     where({ id }, { eq }) {
       return eq(id, brandId)
     },
+    with: {
+      media: {
+        with: {
+          media: true
+        }
+      }
+    }
   })
+
+  if (!brand) {
+    return
+  }
+
+  return getMappedBrand(brand)
 }
 
 export async function getBrandByTitle(brandTitle: string) {

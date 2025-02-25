@@ -7,10 +7,10 @@ export const brandsMedia = pgTable(
     {
         brandId: integer('brand_id')
             .notNull()
-            .references(() => brands.id),
+            .references(() => brands.id, { onDelete: 'cascade' }),
         mediaId: integer('media_id')
             .notNull()
-            .references(() => media.id)
+            .references(() => media.id, { onDelete: 'cascade' })
     },
     (table) => [
         primaryKey({ columns: [table.brandId, table.mediaId] })

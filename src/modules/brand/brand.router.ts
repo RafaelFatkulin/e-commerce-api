@@ -12,7 +12,7 @@ const paths = {
   root: '/brands',
   id: () => paths.root.concat('/{id}'),
   create: () => paths.root,
-  update: () => paths.id().concat('/update'),
+  update: () => paths.id().concat('/edit'),
   delete: () => paths.id().concat('/delete'),
 }
 
