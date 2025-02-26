@@ -1,10 +1,9 @@
 import type {
-  Brand,
   BrandsFilter,
   BrandWithMedia,
   BrandWithMediaOnly,
   CreateBrand,
-  UpdateBrand
+  UpdateBrand,
 } from './brand.types'
 import { db } from '@database'
 import { table } from '@database/schemas'
@@ -22,7 +21,7 @@ function getMappedBrand(brand: BrandWithMedia): BrandWithMediaOnly {
   return {
     ...brand,
     media: brand.media.map(bm => bm.media).sort((a, b) => a.order - b.order),
-  };
+  }
 }
 
 export async function getBrands(filter: BrandsFilter) {
@@ -54,9 +53,9 @@ export async function getBrands(filter: BrandsFilter) {
     with: {
       media: {
         with: {
-          media: true
-        }
-      }
+          media: true,
+        },
+      },
     },
     limit: page ? per_page : undefined,
     offset: page ? (page - 1) * per_page : undefined,
@@ -66,11 +65,11 @@ export async function getBrands(filter: BrandsFilter) {
     data: getMappedBrands(brands),
     meta: page
       ? {
-        total: totalCount,
-        totalPages,
-        limit: per_page,
-        page,
-      }
+          total: totalCount,
+          totalPages,
+          limit: per_page,
+          page,
+        }
       : undefined,
   }
 }
@@ -83,10 +82,10 @@ export async function getBrandById(brandId: number) {
     with: {
       media: {
         with: {
-          media: true
-        }
-      }
-    }
+          media: true,
+        },
+      },
+    },
   })
 
   if (!brand) {

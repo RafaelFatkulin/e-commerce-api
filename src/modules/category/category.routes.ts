@@ -5,7 +5,7 @@ import { authMiddleware } from '@modules/auth/auth.middleware'
 import { errorResponseSchema, getSuccessResponseSchema } from '@utils/response'
 import { HttpStatusCodes } from '@utils/status-codes'
 import { IdParamsSchema, SlugParamsSchema } from '@utils/zod'
-import { categoriesFilterSchema, categoryCreateSchema, categorySchema, categorySelectSchema, categoryTreeSchema, categoryUpdateSchema } from './category.schema'
+import { categoriesFilterSchema, categoryCreateSchema, categorySchema, categorySelectSchema, categoryUpdateSchema } from './category.schema'
 
 const basePath = '/categories'
 const tags = ['Categories']
@@ -78,7 +78,7 @@ const getBySlug = createRoute({
   path: basePath.concat('/slug/{slug}'),
   method: 'get',
   request: {
-    params: SlugParamsSchema
+    params: SlugParamsSchema,
   },
   responses: {
     [HttpStatusCodes.OK]: jsonContent(

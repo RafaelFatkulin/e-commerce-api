@@ -69,7 +69,7 @@ const get: AppRouteHandler<GetRoute> = async (c) => {
 
 const getBySlug: AppRouteHandler<GetBySlugRoute> = async (c) => {
   const { slug } = c.req.valid('param')
-  console.log('Received slug:', slug);
+
   try {
     const category = await getCategoryBySlug(slug)
 

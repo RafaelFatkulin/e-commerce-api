@@ -14,6 +14,7 @@ const paths = {
   create: () => paths.root,
   update: () => paths.id().concat('/edit'),
   delete: () => paths.id().concat('/delete'),
+  uploadMedia: () => paths.id().concat('/upload-media'),
 }
 
 export const routes = {
@@ -87,6 +88,37 @@ export const routes = {
       ),
     },
   }),
+  uploadMedia: createRoute({
+    tags,
+    path: paths.uploadMedia(),
+    method: 'post',
+    request: {
+      params: IdParamsSchema,
+      body: {
+        content: {
+          'multipart/form-data': {
+            schema: z.object({
+              files: z.array(z.instanceof(File)).optional(),
+            }),
+          },
+        },
+      },
+    },
+    responses: {
+      [HttpStatusCodes.CREATED]: jsonContent(
+        getSuccessResponseSchema(),
+        'Brand files successfully uploaded',
+      ),
+      [HttpStatusCodes.BAD_REQUEST]: jsonContent(
+        errorResponseSchema,
+        'Error when uploading files for brand',
+      ),
+      [HttpStatusCodes.UNPROCESSABLE_ENTITY]: jsonContent(
+        errorResponseSchema,
+        'Error when uploading files for brand',
+      ),
+    },
+  }),
   update: createRoute({
     tags,
     path: paths.update(),
@@ -139,3 +171,4 @@ export type GetRoute = typeof routes.get
 export type CreateRoute = typeof routes.create
 export type UpdateRoute = typeof routes.update
 export type DeleteRoute = typeof routes.delete
+export type UploadMediaRoute = typeof routes.uploadMedia

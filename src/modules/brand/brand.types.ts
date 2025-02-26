@@ -1,5 +1,5 @@
-import { Media } from '@modules/media';
 import type { z } from '@hono/zod-openapi'
+import type { Media } from '@modules/media'
 import type {
   brandCreateSchema,
   brandSelectSchema,
@@ -14,13 +14,13 @@ export type UpdateBrand = z.infer<typeof brandUpdateSchema>
 export type BrandsFilter = z.infer<typeof brandsFilterSchema>
 export type BrandsMedia = z.infer<typeof brandsMediaSchema>
 export type MediaWithRelation = BrandsMedia & {
-  media: Media;
-};
+  media: Media
+}
 
 export type BrandWithMedia = Brand & {
-  media: MediaWithRelation[];
-};
+  media: MediaWithRelation[]
+}
 
 export type BrandWithMediaOnly = Brand & {
-  media: Media[];
-};
+  media: Media[]
+}

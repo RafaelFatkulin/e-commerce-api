@@ -30,13 +30,14 @@ export async function getCategories(filter: CategoriesFilter) {
       conditions.push(
         or(
           ilike(fields.title, `%${searchQuery}%`),
-          ilike(fields.shortTitle, `%${searchQuery}%`)
-        ) as SQL
+          ilike(fields.shortTitle, `%${searchQuery}%`),
+        ) as SQL,
       )
     }
     if (parent_id !== undefined) {
       conditions.push(eq(fields.parentId, parent_id))
-    } else {
+    }
+    else {
       conditions.push(isNull(fields.parentId))
     }
 
@@ -45,7 +46,7 @@ export async function getCategories(filter: CategoriesFilter) {
 
   const totalCount = await db.$count(
     table.categories,
-    whereConditions
+    whereConditions,
   )
   const totalPages = Math.ceil(totalCount / per_page)
 
@@ -63,18 +64,15 @@ export async function getCategories(filter: CategoriesFilter) {
     offset: page ? (page - 1) * per_page : undefined,
   })
 
-  console.log('@categories', categories);
-
-
   return {
     data: categories,
     meta: page
       ? {
-        total: totalCount,
-        totalPages,
-        limit: per_page,
-        page,
-      }
+          total: totalCount,
+          totalPages,
+          limit: per_page,
+          page,
+        }
       : undefined,
   }
 }
@@ -99,7 +97,7 @@ export async function getCategoryBySlug(categorySlug: string) {
   return db.query.categories.findFirst({
     where({ slug }, { eq }) {
       return eq(slug, categorySlug)
-    }
+    },
   })
 }
 

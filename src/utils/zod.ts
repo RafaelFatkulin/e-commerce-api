@@ -64,6 +64,6 @@ export const SlugParamsSchema = z.object({
       in: 'path',
       required: true,
     },
-    required: ['slug']
-  })
+    required: ['slug'],
+  }),
 })

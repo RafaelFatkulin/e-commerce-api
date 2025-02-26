@@ -1,3 +1,4 @@
+import type { Media } from '@modules/media'
 import type { AppRouteHandler } from 'types'
 import type {
   CreateRoute,
@@ -5,7 +6,12 @@ import type {
   GetRoute,
   ListRoute,
   UpdateRoute,
+  UploadMediaRoute,
 } from './brand.router'
+import { db } from '@database'
+import { table } from '@database/schemas'
+import { deleteMediaByPath, uploadMedia } from '@modules/media'
+import { getFilesArray } from '@utils/get-files-array'
 import { createErrorResponse, createSuccessResponse } from '@utils/response'
 import { HttpStatusCodes } from '@utils/status-codes'
 import {
@@ -16,10 +22,6 @@ import {
   getBrands,
   updateBrand,
 } from './brand.service'
-import { getFilesArray } from '@utils/get-files-array'
-import { deleteMedia, Media, uploadMedia } from '@modules/media'
-import { db } from '@database'
-import { table } from '@database/schemas'
 
 const list: AppRouteHandler<ListRoute> = async (c) => {
   const filters = c.req.valid('query')
@@ -66,43 +68,43 @@ const get: AppRouteHandler<GetRoute> = async (c) => {
 }
 
 const create: AppRouteHandler<CreateRoute> = async (c) => {
-  const body = await c.req.formData();
-  const title = body.get('title') as string;
-  const description = body.get('description') as string | undefined;
+  const body = await c.req.formData()
+  const title = body.get('title') as string
+  const description = body.get('description') as string | undefined
 
-  const files = getFilesArray(body);
+  const files = getFilesArray(body)
 
   const data = {
     title,
     description,
     ...(files.length > 0 && { files }),
-  };
+  }
 
-  const existingBrand = await getBrandByTitle(title);
+  const existingBrand = await getBrandByTitle(title)
   if (existingBrand) {
     return c.json(
       createErrorResponse({
         message: `Бренд "${title}" уже существует`,
       }),
-      HttpStatusCodes.BAD_REQUEST
-    );
+      HttpStatusCodes.BAD_REQUEST,
+    )
   }
 
   try {
-    let mediaItems: Media[] = [];
+    let mediaItems: Media[] = []
 
     if (files.length > 0) {
-      mediaItems = await uploadMedia('brand', files);
+      mediaItems = await uploadMedia('brand', files)
     }
 
-    const [brand] = await createBrand(data);
+    const [brand] = await createBrand(data)
 
     if (mediaItems.length > 0) {
       for (const item of mediaItems) {
         await db.insert(table.brandsMedia).values({
           brandId: brand.id,
-          mediaId: item.id
-        });
+          mediaId: item.id,
+        })
       }
     }
 
@@ -111,17 +113,18 @@ const create: AppRouteHandler<CreateRoute> = async (c) => {
         message: `Бренд "${brand.title}" создан`,
         data: brand,
       }),
-      HttpStatusCodes.CREATED
-    );
-  } catch (error) {
+      HttpStatusCodes.CREATED,
+    )
+  }
+  catch (error) {
     return c.json(
       createErrorResponse({
         message: 'Ошибка при создании бренда',
       }),
-      HttpStatusCodes.BAD_REQUEST
-    );
+      HttpStatusCodes.BAD_REQUEST,
+    )
   }
-};
+}
 
 const update: AppRouteHandler<UpdateRoute> = async (c) => {
   const { id } = c.req.valid('param')
@@ -175,7 +178,7 @@ const deleteHandler: AppRouteHandler<DeleteRoute> = async (c) => {
     const [brand] = await deleteBrand(id)
 
     for (const media of existingBrand.media) {
-      deleteMedia(media.path)
+      deleteMediaByPath(media.path)
     }
 
     return c.json(
@@ -194,10 +197,60 @@ const deleteHandler: AppRouteHandler<DeleteRoute> = async (c) => {
   }
 }
 
+const uploadMediaFiles: AppRouteHandler<UploadMediaRoute> = async (c) => {
+  const { id } = c.req.valid('param')
+  const body = await c.req.formData()
+  const files = getFilesArray(body)
+
+  const existingBrand = await getBrandById(id)
+  if (!existingBrand) {
+    return c.json(
+      createErrorResponse({
+        message: `Бренд не найден`,
+      }),
+      HttpStatusCodes.BAD_REQUEST,
+    )
+  }
+
+  try {
+    let mediaItems: Media[] = []
+
+    if (files.length) {
+      mediaItems = await uploadMedia('brand', files)
+    }
+
+    if (mediaItems.length > 0) {
+      for (const item of mediaItems) {
+        await db.insert(table.brandsMedia).values({
+          brandId: existingBrand.id,
+          mediaId: item.id,
+        })
+      }
+    }
+
+    return c.json(
+      createSuccessResponse({
+        message: `Медиа-файлы загружены`,
+        data: null,
+      }),
+      HttpStatusCodes.CREATED,
+    )
+  }
+  catch {
+    return c.json(
+      createErrorResponse({
+        message: 'Ошибка при загрузке медиа-файлов',
+      }),
+      HttpStatusCodes.BAD_REQUEST,
+    )
+  }
+}
+
 export const handlers = {
   list,
   get,
   create,
   update,
   delete: deleteHandler,
+  uploadMedia: uploadMediaFiles,
 }

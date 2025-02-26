@@ -1,4 +1,4 @@
- import { boolean, integer, pgTable, timestamp, varchar } from 'drizzle-orm/pg-core'
+import { boolean, integer, pgTable, timestamp, varchar } from 'drizzle-orm/pg-core'
 
 export const refreshToken = pgTable('refresh_tokens', {
   id: integer().generatedAlwaysAsIdentity().primaryKey(),
