@@ -25,9 +25,9 @@ import {
 
 const list: AppRouteHandler<ListRoute> = async (c) => {
   const filters = c.req.valid('query')
-  const { data, meta } = await getBrands(filters)
 
   try {
+    const { data, meta } = await getBrands(filters)
     return c.json(
       createSuccessResponse({ data, meta }),
       HttpStatusCodes.OK,
@@ -35,7 +35,7 @@ const list: AppRouteHandler<ListRoute> = async (c) => {
   }
   catch {
     return c.json(
-      createErrorResponse({ message: 'Ощибка при получении бренда' }),
+      createErrorResponse({ message: 'Ощибка при загрузке брендов' }),
       HttpStatusCodes.BAD_REQUEST,
     )
   }
@@ -61,7 +61,7 @@ const get: AppRouteHandler<GetRoute> = async (c) => {
   }
   catch {
     return c.json(
-      createErrorResponse({ message: 'Ошибка при получении брендов' }),
+      createErrorResponse({ message: 'Ошибка при загрузке бренда' }),
       HttpStatusCodes.BAD_REQUEST,
     )
   }

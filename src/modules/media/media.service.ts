@@ -16,7 +16,7 @@ export async function uploadMedia(source: MediaSource, files: File[]) {
       const item = await db.insert(table.media).values({
         type: (file.type.startsWith('image') ? 'image' : 'video') as MediaType,
         path: `/uploads/${source}/${fileName}`,
-        order: 1,
+        order: index + 1,
         status: 'active' as MediaStatus,
         alt: file.name,
       }).returning()

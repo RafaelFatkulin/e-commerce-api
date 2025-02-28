@@ -1,3 +1,4 @@
+import type { SuccessResponse } from '@utils/response'
 import type { SQL } from 'drizzle-orm'
 import type {
   CategoriesFilter,
@@ -74,7 +75,7 @@ export async function getCategories(filter: CategoriesFilter) {
           page,
         }
       : undefined,
-  }
+  } as SuccessResponse<Category[]>
 }
 
 export async function getCategoryById(categoryId: number) {
