@@ -39,3 +39,8 @@ export const categoriesFilterSchema = z.object({
   sort_by: categorySelectSchema.keyof().optional(),
   sort_order: z.enum(['asc', 'desc']).optional(),
 })
+
+export const categoryMinimalSchema = categorySelectSchema.pick({
+  id: true,
+  title: true
+})

@@ -4,7 +4,8 @@ import { createRoute, z } from '@hono/zod-openapi'
 import { errorResponseSchema, getSuccessResponseSchema } from '@utils/response'
 import { HttpStatusCodes } from '@utils/status-codes'
 import { IdParamsSchema } from '@utils/zod'
-import { brandCreateSchema, brandSelectSchema, brandsFilterSchema, brandUpdateSchema } from './brand.schema'
+import { brandCreateSchema, brandMinimalSchema, brandSelectSchema, brandsFilterSchema, brandUpdateSchema } from './brand.schema'
+import { authMiddleware } from '@modules/auth/auth.middleware'
 
 const tags = ['Brands']
 
@@ -15,6 +16,7 @@ const paths = {
   update: () => paths.id().concat('/edit'),
   delete: () => paths.id().concat('/delete'),
   uploadMedia: () => paths.id().concat('/upload-media'),
+  minimalList: () => paths.root.concat('/list')
 }
 
 export const routes = {
@@ -33,6 +35,21 @@ export const routes = {
         'Error when getting a brands',
       ),
     },
+  }),
+  minimalList: createRoute({
+    tags,
+    path: paths.minimalList(),
+    method: 'get',
+    responses: {
+      [HttpStatusCodes.OK]: jsonContent(
+        getSuccessResponseSchema(z.array(brandMinimalSchema)),
+        'The list of minimal brands',
+      ),
+      [HttpStatusCodes.BAD_REQUEST]: jsonContent(
+        errorResponseSchema,
+        'Error when getting a list of minimal brands',
+      ),
+    }
   }),
   get: createRoute({
     tags,
@@ -60,6 +77,10 @@ export const routes = {
     tags,
     path: paths.create(),
     method: 'post',
+    middleware: [(c, next) => authMiddleware(c, next, ['admin'])] as const,
+    security: [{
+      Bearer: [],
+    }],
     request: {
       body: {
         content: {
@@ -92,6 +113,10 @@ export const routes = {
     tags,
     path: paths.uploadMedia(),
     method: 'post',
+    middleware: [(c, next) => authMiddleware(c, next, ['admin'])] as const,
+    security: [{
+      Bearer: [],
+    }],
     request: {
       params: IdParamsSchema,
       body: {
@@ -123,6 +148,10 @@ export const routes = {
     tags,
     path: paths.update(),
     method: 'patch',
+    middleware: [(c, next) => authMiddleware(c, next, ['admin'])] as const,
+    security: [{
+      Bearer: [],
+    }],
     request: {
       params: IdParamsSchema,
       body: jsonContentRequired(brandUpdateSchema, 'Brand\'s data to update'),
@@ -146,6 +175,10 @@ export const routes = {
     tags,
     path: paths.delete(),
     method: 'delete',
+    middleware: [(c, next) => authMiddleware(c, next, ['admin'])] as const,
+    security: [{
+      Bearer: [],
+    }],
     request: {
       params: IdParamsSchema,
     },
@@ -167,6 +200,7 @@ export const routes = {
 }
 
 export type ListRoute = typeof routes.list
+export type MinimalListRoute = typeof routes.minimalList
 export type GetRoute = typeof routes.get
 export type CreateRoute = typeof routes.create
 export type UpdateRoute = typeof routes.update

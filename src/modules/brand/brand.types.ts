@@ -2,6 +2,7 @@ import type { z } from '@hono/zod-openapi'
 import type { Media } from '@modules/media'
 import type {
   brandCreateSchema,
+  brandMinimalSchema,
   brandSelectSchema,
   brandsFilterSchema,
   brandsMediaSchema,
@@ -24,3 +25,5 @@ export type BrandWithMedia = Brand & {
 export type BrandWithMediaOnly = Brand & {
   media: Media[]
 }
+
+export type BrandMinimal = z.infer<typeof brandMinimalSchema>

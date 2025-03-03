@@ -4,6 +4,7 @@ import { routes } from './category.routes'
 
 export const category = createRouter()
   .openapi(routes.list, handlers.list)
+  .openapi(routes.minimalList, handlers.minimalList)
   .openapi(routes.tree, handlers.tree)
   .openapi(routes.get, handlers.get)
   .openapi(routes.getBySlug, handlers.getBySlug)

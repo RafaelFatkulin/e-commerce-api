@@ -1,6 +1,6 @@
 import type { SuccessResponse } from '@utils/response'
 import type { SQL } from 'drizzle-orm'
-import type { Product, ProductCreate, ProductFilter, ProductUpdate } from './products.type'
+import type { Product, ProductCreate, ProductFilter, ProductUpdate, ProductWithInfo } from './products.type'
 import { db } from '@database'
 import { table } from '@database/schemas'
 import { and, eq, ilike } from 'drizzle-orm'
@@ -16,6 +16,9 @@ export async function getProducts(filter: ProductFilter) {
         sort_by = 'id',
         sort_order = 'desc',
     } = filter
+
+    console.log({ filter });
+
 
     const whereConditions = (() => {
         const conditions: SQL[] = []
@@ -47,10 +50,14 @@ export async function getProducts(filter: ProductFilter) {
         },
         limit: page ? per_page : undefined,
         offset: page ? (page - 1) * per_page : undefined,
+        with: {
+            brand: true,
+            category: true
+        }
     })
 
     return {
-        data: products,
+        data: products.map(product => ({ ...product, brand: product.brand?.title, category: product.category?.title })),
         meta: page
             ? {
                 total: totalCount,
@@ -59,7 +66,7 @@ export async function getProducts(filter: ProductFilter) {
                 page,
             }
             : undefined,
-    } as SuccessResponse<Product[]>
+    } as SuccessResponse<ProductWithInfo[]>
 }
 
 export async function getProductById(productId: number) {
@@ -90,6 +97,8 @@ export async function createProduct(data: ProductCreate) {
     return db.insert(table.products).values({
         ...data,
         slug: translit(data.title.toLowerCase()),
+        order: data.order || 1,
+        status: data.status || 'active'
     }).returning()
 }
 

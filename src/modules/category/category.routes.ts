@@ -5,14 +5,24 @@ import { authMiddleware } from '@modules/auth/auth.middleware'
 import { errorResponseSchema, getSuccessResponseSchema } from '@utils/response'
 import { HttpStatusCodes } from '@utils/status-codes'
 import { IdParamsSchema, SlugParamsSchema } from '@utils/zod'
-import { categoriesFilterSchema, categoryCreateSchema, categorySchema, categorySelectSchema, categoryUpdateSchema } from './category.schema'
+import { categoriesFilterSchema, categoryCreateSchema, categoryMinimalSchema, categorySchema, categorySelectSchema, categoryUpdateSchema } from './category.schema'
 
-const basePath = '/categories'
 const tags = ['Categories']
+
+const paths = {
+  root: '/categories',
+  id: () => paths.root.concat('/{id}'),
+  create: () => paths.root,
+  update: () => paths.id().concat('/edit'),
+  delete: () => paths.id().concat('/delete'),
+  minimalList: () => paths.root.concat('/list'),
+  tree: () => paths.root.concat('/tree'),
+  slug: () => paths.root.concat('/slug/{slug}'),
+}
 
 const list = createRoute({
   tags,
-  path: basePath,
+  path: paths.root,
   method: 'get',
   request: {
     query: categoriesFilterSchema,
@@ -29,9 +39,25 @@ const list = createRoute({
   },
 })
 
+const minimalList = createRoute({
+  tags,
+  path: paths.minimalList(),
+  method: 'get',
+  responses: {
+    [HttpStatusCodes.OK]: jsonContent(
+      getSuccessResponseSchema(z.array(categoryMinimalSchema)),
+      'The list of minimal brands',
+    ),
+    [HttpStatusCodes.BAD_REQUEST]: jsonContent(
+      errorResponseSchema,
+      'Error when getting a list of minimal brands',
+    ),
+  }
+})
+
 const tree = createRoute({
   tags,
-  path: basePath.concat('/tree'),
+  path: paths.tree(),
   method: 'get',
   request: {
     query: z.object({
@@ -52,7 +78,7 @@ const tree = createRoute({
 
 const get = createRoute({
   tags,
-  path: basePath.concat('/{id}'),
+  path: paths.id(),
   method: 'get',
   request: {
     params: IdParamsSchema,
@@ -75,7 +101,7 @@ const get = createRoute({
 
 const getBySlug = createRoute({
   tags,
-  path: basePath.concat('/slug/{slug}'),
+  path: paths.slug(),
   method: 'get',
   request: {
     params: SlugParamsSchema,
@@ -98,7 +124,7 @@ const getBySlug = createRoute({
 
 const create = createRoute({
   tags,
-  path: basePath,
+  path: paths.create(),
   method: 'post',
   middleware: [(c, next) => authMiddleware(c, next, ['admin'])] as const,
   security: [{
@@ -125,7 +151,7 @@ const create = createRoute({
 
 const update = createRoute({
   tags,
-  path: basePath.concat('/{id}'),
+  path: paths.update(),
   method: 'patch',
   middleware: [(c, next) => authMiddleware(c, next, ['admin'])] as const,
   security: [{
@@ -153,7 +179,7 @@ const update = createRoute({
 
 const deleteCategory = createRoute({
   tags,
-  path: basePath.concat('/{id}'),
+  path: paths.delete(),
   method: 'delete',
   middleware: [(c, next) => authMiddleware(c, next, ['admin'])] as const,
   security: [{
@@ -180,15 +206,17 @@ const deleteCategory = createRoute({
 
 export const routes = {
   list,
+  minimalList,
   tree,
   get,
   getBySlug,
   create,
   update,
-  delete: deleteCategory,
+  delete: deleteCategory
 }
 
 export type ListRoute = typeof list
+export type MinimalListRoute = typeof minimalList
 export type TreeRoute = typeof tree
 export type GetRoute = typeof get
 export type GetBySlugRoute = typeof getBySlug

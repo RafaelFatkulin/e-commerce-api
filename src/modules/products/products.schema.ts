@@ -16,7 +16,7 @@ export const productCreateSchema = createInsertSchema(table.products, {
     brandId: z.number({ message: 'ID бренда является обязательнам параметром' }),
     categoryId: z.number({ message: 'ID категории является обязательнам параметром' }),
     order: z.number().min(1, 'Минимальное значение поля - 1').nullable().optional(),
-    status: productStatusSchema,
+    status: productStatusSchema.nullable().optional(),
 }).openapi('Product create schema')
 
 export const productUpdateSchema = createUpdateSchema(table.products, {
@@ -27,7 +27,7 @@ export const productUpdateSchema = createUpdateSchema(table.products, {
     categoryId: z.number({ message: 'ID категории является обязательнам параметром' }).optional(),
     order: z.number().min(1, 'Минимальное значение поля - 1').optional(),
     status: productStatusSchema.optional(),
-})
+}).openapi('Product edit schema')
 
 export const productsFilterSchema = z.object({
     q: z.string().optional().openapi('Search string'),
@@ -37,4 +37,9 @@ export const productsFilterSchema = z.object({
     per_page: z.coerce.number().optional(),
     sort_by: productSelectSchema.keyof().optional(),
     sort_order: z.enum(['asc', 'desc']).optional(),
+}).openapi('Product filter schema')
+
+export const productWithInfoSchema = productSelectSchema.extend({
+    brand: z.string(),
+    caregory: z.string(),
 })

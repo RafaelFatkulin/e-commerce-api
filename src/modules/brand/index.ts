@@ -4,6 +4,7 @@ import { routes } from './brand.router'
 
 export const brand = createRouter()
   .openapi(routes.list, handlers.list)
+  .openapi(routes.minimalList, handlers.minimalList)
   .openapi(routes.get, handlers.get)
   .openapi(routes.create, handlers.create)
   .openapi(routes.update, handlers.update)

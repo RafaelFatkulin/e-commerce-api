@@ -1,8 +1,28 @@
 import type { AppRouteHandler } from 'types'
-import type { CreateRoute, DeleteRoute, GetBySlugRoute, GetRoute, ListRoute, TreeRoute, UpdateRoute } from './category.routes'
+import type {
+  CreateRoute,
+  DeleteRoute,
+  GetBySlugRoute,
+  GetRoute,
+  ListRoute,
+  MinimalListRoute,
+  TreeRoute,
+  UpdateRoute
+} from './category.routes'
 import { createErrorResponse, createSuccessResponse } from '@utils/response'
 import { HttpStatusCodes } from '@utils/status-codes'
-import { createCategory, deleteCategory, getCategories, getCategoriesTree, getCategoryById, getCategoryBySlug, getCategoryByTitle, getCategoryChildCount, updateCategory } from './category.service'
+import {
+  createCategory,
+  deleteCategory,
+  getCategories,
+  getCategoriesTree,
+  getCategoryById,
+  getCategoryBySlug,
+  getCategoryByTitle,
+  getCategoryChildCount,
+  getCategoryList,
+  updateCategory
+} from './category.service'
 
 const list: AppRouteHandler<ListRoute> = async (c) => {
   const filters = c.req.valid('query')
@@ -17,6 +37,23 @@ const list: AppRouteHandler<ListRoute> = async (c) => {
   catch {
     return c.json(
       createErrorResponse({ message: 'Ошибка при получении категорий' }),
+      HttpStatusCodes.BAD_REQUEST,
+    )
+  }
+}
+
+const minimalList: AppRouteHandler<MinimalListRoute> = async (c) => {
+  try {
+    const categories = await getCategoryList()
+
+    return c.json(
+      createSuccessResponse({ data: categories }),
+      HttpStatusCodes.OK,
+    )
+  }
+  catch {
+    return c.json(
+      createErrorResponse({ message: 'Ошибка при загрузке категорий' }),
       HttpStatusCodes.BAD_REQUEST,
     )
   }
@@ -224,4 +261,5 @@ export const handlers = {
   create,
   update,
   delete: deleteCategoryHandler,
+  minimalList
 }

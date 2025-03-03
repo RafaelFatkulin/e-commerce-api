@@ -1,4 +1,6 @@
 import type {
+  Brand,
+  BrandMinimal,
   BrandsFilter,
   BrandWithMedia,
   BrandWithMediaOnly,
@@ -22,6 +24,10 @@ function getMappedBrand(brand: BrandWithMedia): BrandWithMediaOnly {
     ...brand,
     media: brand.media.map(bm => bm.media).sort((a, b) => a.order - b.order),
   }
+}
+
+function getMinimalMappedBrands(brands: Brand[]): BrandMinimal[] {
+  return brands.map(({ id, title }) => ({ id, title }))
 }
 
 export async function getBrands(filter: BrandsFilter) {
@@ -65,13 +71,23 @@ export async function getBrands(filter: BrandsFilter) {
     data: getMappedBrands(brands),
     meta: page
       ? {
-          total: totalCount,
-          totalPages,
-          limit: per_page,
-          page,
-        }
+        total: totalCount,
+        totalPages,
+        limit: per_page,
+        page,
+      }
       : undefined,
   }
+}
+
+export async function getBrandList() {
+  const brands = await db.query.brands.findMany({
+    orderBy(fields, operators) {
+      return operators.asc(fields.title)
+    },
+  })
+
+  return getMinimalMappedBrands(brands)
 }
 
 export async function getBrandById(brandId: number) {

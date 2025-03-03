@@ -31,3 +31,8 @@ export const brandsFilterSchema = z.object({
 })
 
 export const brandsMediaSchema = createSelectSchema(table.brandsMedia)
+
+export const brandMinimalSchema = brandSelectSchema.pick({
+  id: true,
+  title: true,
+})

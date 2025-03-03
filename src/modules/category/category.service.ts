@@ -3,6 +3,7 @@ import type { SQL } from 'drizzle-orm'
 import type {
   CategoriesFilter,
   Category,
+  CategoryMinimal,
   CreateCategory,
   UpdateCategory,
 } from './category.type'
@@ -10,6 +11,10 @@ import { db } from '@database'
 import { table } from '@database/schemas'
 import { translit } from '@utils/translit'
 import { and, eq, ilike, isNull, or } from 'drizzle-orm'
+
+function getMinimalMappedCategories(categories: Category[]): CategoryMinimal[] {
+  return categories.map(({ id, title }) => ({ id, title }))
+}
 
 export async function getCategories(filter: CategoriesFilter) {
   const {
@@ -69,13 +74,23 @@ export async function getCategories(filter: CategoriesFilter) {
     data: categories,
     meta: page
       ? {
-          total: totalCount,
-          totalPages,
-          limit: per_page,
-          page,
-        }
+        total: totalCount,
+        totalPages,
+        limit: per_page,
+        page,
+      }
       : undefined,
   } as SuccessResponse<Category[]>
+}
+
+export async function getCategoryList() {
+  const categories = await db.query.categories.findMany({
+    orderBy(fields, operators) {
+      return operators.asc(fields.title)
+    }
+  })
+
+  return getMinimalMappedCategories(categories)
 }
 
 export async function getCategoryById(categoryId: number) {

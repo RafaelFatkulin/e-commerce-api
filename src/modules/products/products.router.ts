@@ -1,5 +1,5 @@
 import { createRoute, z } from "@hono/zod-openapi"
-import { productCreateSchema, productSelectSchema, productsFilterSchema, productUpdateSchema } from "./products.schema"
+import { productCreateSchema, productSelectSchema, productsFilterSchema, productUpdateSchema, productWithInfoSchema } from "./products.schema"
 import { IdParamsSchema, SlugParamsSchema } from "@utils/zod"
 import { HttpStatusCodes } from "@utils/status-codes"
 import { jsonContent } from "@helpers/json-content"
@@ -24,7 +24,7 @@ export const routes = {
         request: { query: productsFilterSchema },
         responses: {
             [HttpStatusCodes.OK]: jsonContent(
-                getSuccessResponseSchema(z.array(productSelectSchema)),
+                getSuccessResponseSchema(z.array(productWithInfoSchema)),
                 'The list of products',
             ),
             [HttpStatusCodes.BAD_REQUEST]: jsonContent(

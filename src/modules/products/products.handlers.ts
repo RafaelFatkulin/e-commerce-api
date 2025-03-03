@@ -6,6 +6,8 @@ import { HttpStatusCodes } from "@utils/status-codes";
 
 const list: AppRouteHandler<ListRoute> = async (c) => {
     const filters = c.req.valid('query')
+    console.log("@filters", filters);
+
 
     try {
         const { data, meta } = await getProducts(filters)
@@ -80,12 +82,13 @@ const create: AppRouteHandler<CreateRoute> = async (c) => {
     if (existingProduct) {
         return c.json(
             createErrorResponse({ message: 'Товар с таким названием уже существует' }),
-            HttpStatusCodes.NOT_FOUND
+            HttpStatusCodes.BAD_REQUEST
         )
     }
 
     try {
         const [product] = await createProduct(data)
+        console.log(product);
 
         return c.json(
             createSuccessResponse({
@@ -94,7 +97,9 @@ const create: AppRouteHandler<CreateRoute> = async (c) => {
             }),
             HttpStatusCodes.CREATED,
         )
-    } catch {
+    } catch (err) {
+        console.log(err);
+
         return c.json(
             createErrorResponse({
                 message: 'Ошибка при создании товара',

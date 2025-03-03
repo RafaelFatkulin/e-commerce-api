@@ -5,6 +5,7 @@ import type {
   DeleteRoute,
   GetRoute,
   ListRoute,
+  MinimalListRoute,
   UpdateRoute,
   UploadMediaRoute,
 } from './brand.router'
@@ -19,6 +20,7 @@ import {
   deleteBrand,
   getBrandById,
   getBrandByTitle,
+  getBrandList,
   getBrands,
   updateBrand,
 } from './brand.service'
@@ -35,7 +37,23 @@ const list: AppRouteHandler<ListRoute> = async (c) => {
   }
   catch {
     return c.json(
-      createErrorResponse({ message: 'Ощибка при загрузке брендов' }),
+      createErrorResponse({ message: 'Ошибка при загрузке брендов' }),
+      HttpStatusCodes.BAD_REQUEST,
+    )
+  }
+}
+
+const minimalList: AppRouteHandler<MinimalListRoute> = async (c) => {
+  try {
+    const brands = await getBrandList()
+    return c.json(
+      createSuccessResponse({ data: brands }),
+      HttpStatusCodes.OK,
+    )
+  }
+  catch {
+    return c.json(
+      createErrorResponse({ message: 'Ошибка при загрузке брендов' }),
       HttpStatusCodes.BAD_REQUEST,
     )
   }
@@ -253,4 +271,5 @@ export const handlers = {
   update,
   delete: deleteHandler,
   uploadMedia: uploadMediaFiles,
+  minimalList
 }
