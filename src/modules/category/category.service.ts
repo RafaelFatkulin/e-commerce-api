@@ -83,8 +83,11 @@ export async function getCategories(filter: CategoriesFilter) {
   } as SuccessResponse<Category[]>
 }
 
-export async function getCategoryList() {
+export async function getCategoryList(withoutRoot: boolean = false) {
   const categories = await db.query.categories.findMany({
+    where(fields, operators) {
+      return withoutRoot ? operators.isNotNull(fields.parentId) : undefined
+    },
     orderBy(fields, operators) {
       return operators.asc(fields.title)
     }

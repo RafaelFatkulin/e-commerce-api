@@ -24,6 +24,7 @@ import {
   getBrands,
   updateBrand,
 } from './brand.service'
+import { eq } from 'drizzle-orm'
 
 const list: AppRouteHandler<ListRoute> = async (c) => {
   const filters = c.req.valid('query')
@@ -194,6 +195,14 @@ const deleteHandler: AppRouteHandler<DeleteRoute> = async (c) => {
 
   try {
     const [brand] = await deleteBrand(id)
+
+    await db
+      .update(table.products)
+      .set({ status: 'not-active' })
+      .where(eq(
+        table.products.brandId,
+        brand.id
+      ))
 
     for (const media of existingBrand.media) {
       deleteMediaByPath(media.path)

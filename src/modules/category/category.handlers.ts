@@ -23,6 +23,9 @@ import {
   getCategoryList,
   updateCategory
 } from './category.service'
+import { db } from '@database'
+import { table } from '@database/schemas'
+import { eq } from 'drizzle-orm'
 
 const list: AppRouteHandler<ListRoute> = async (c) => {
   const filters = c.req.valid('query')
@@ -43,8 +46,10 @@ const list: AppRouteHandler<ListRoute> = async (c) => {
 }
 
 const minimalList: AppRouteHandler<MinimalListRoute> = async (c) => {
+  const { "not-root": isNotRoot } = c.req.valid('query')
+
   try {
-    const categories = await getCategoryList()
+    const categories = await getCategoryList(isNotRoot)
 
     return c.json(
       createSuccessResponse({ data: categories }),
@@ -236,6 +241,14 @@ const deleteCategoryHandler: AppRouteHandler<DeleteRoute> = async (c) => {
 
   try {
     const [category] = await deleteCategory(id)
+
+    await db
+      .update(table.products)
+      .set({ status: 'not-active' })
+      .where(eq(
+        table.products.categoryId,
+        category.id
+      ))
 
     return c.json(
       createSuccessResponse({

@@ -43,6 +43,11 @@ const minimalList = createRoute({
   tags,
   path: paths.minimalList(),
   method: 'get',
+  request: {
+    query: z.object({
+      'not-root': z.coerce.boolean().optional().openapi('Is not root categories')
+    })
+  },
   responses: {
     [HttpStatusCodes.OK]: jsonContent(
       getSuccessResponseSchema(z.array(categoryMinimalSchema)),

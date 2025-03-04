@@ -4,3 +4,4 @@ node_modules/
 /uploads
 .env
 bun.lockb
+server.exe
